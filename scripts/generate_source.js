@@ -1528,6 +1528,1390 @@ fetch('https://api.weather.com/jakarta')
 - Baca kode orang lain (open source)
 - Jangan bandingin diri sama orang lain, fokus progress sendiri`
   },
+  
+  // === WEB DEVELOPMENT ( tambahan untuk AI jago bikin website ) ===
+  {
+    user: "Bikin landing page HTML/CSS sederhana yang responsive",
+    assistant: `\`\`\`html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jasa Digital - Landing Page</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+    }
+    
+    /* Navbar sticky */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    nav .logo { font-weight: 700; font-size: 1.25rem; color: #4f46e5; }
+    nav .links { display: flex; gap: 2rem; }
+    nav a { color: #4b5563; text-decoration: none; font-weight: 500; }
+    nav a:hover { color: #4f46e5; }
+    
+    /* Hero */
+    .hero {
+      padding: 6rem 2rem 4rem;
+      text-align: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .hero h1 { font-size: 3rem; margin-bottom: 1rem; line-height: 1.2; }
+    .hero p { font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto 2rem; }
+    .hero .cta {
+      display: inline-block;
+      padding: 0.875rem 2rem;
+      background: white; color: #4f46e5;
+      border-radius: 8px; font-weight: 600; text-decoration: none;
+      transition: transform 0.2s;
+    }
+    .hero .cta:hover { transform: translateY(-2px); }
+    
+    /* Features grid */
+    .features {
+      max-width: 1200px; margin: 0 auto;
+      padding: 4rem 2rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .feature {
+      padding: 2rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      transition: box-shadow 0.2s;
+    }
+    .feature:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .feature .icon { font-size: 2rem; margin-bottom: 1rem; }
+    .feature h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .feature p { color: #6b7280; }
+    
+    /* CTA section */
+    .cta-section {
+      background: #f9fafb;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .cta-section h2 { font-size: 2rem; margin-bottom: 1rem; }
+    .cta-section .btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: #4f46e5; color: white;
+      border-radius: 8px; text-decoration: none; font-weight: 600;
+    }
+    
+    footer {
+      padding: 2rem;
+      text-align: center; color: #6b7280;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    /* Responsive - mobile */
+    @media (max-width: 640px) {
+      nav { padding: 1rem; }
+      nav .links { display: none; } /* Bisa diubah jadi hamburger menu */
+      .hero h1 { font-size: 2rem; }
+      .hero p { font-size: 1rem; }
+      .features { padding: 2rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">BrandName</div>
+    <div class="links">
+      <a href="#features">Fitur</a>
+      <a href="#pricing">Harga</a>
+      <a href="#contact">Kontak</a>
+    </div>
+  </nav>
+  
+  <section class="hero">
+    <h1>Solusi Digital untuk Bisnis Anda</h1>
+    <p>Bikin website profesional dalam hitungan menit. Tanpa coding, tanpa ribet.</p>
+    <a href="#cta" class="cta">Mulai Sekarang</a>
+  </section>
+  
+  <section class="features" id="features">
+    <div class="feature">
+      <div class="icon">⚡</div>
+      <h3>Cepat</h3>
+      <p>Load di bawah 1 detik. Optimal untuk SEO dan user experience.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📱</div>
+      <h3>Responsive</h3>
+      <p>Tampil sempurna di HP, tablet, dan desktop. Mobile-first design.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔒</div>
+      <h3>Aman</h3>
+      <p>SSL gratis, backup harian, proteksi DDoS bawaan.</p>
+    </div>
+  </section>
+  
+  <section class="cta-section" id="cta">
+    <h2>Siap Mulai?</h2>
+    <p style="margin-bottom: 2rem; color: #6b7280;">Coba gratis 14 hari, tanpa kartu kredit.</p>
+    <a href="#" class="btn">Daftar Gratis</a>
+  </section>
+  
+  <footer>
+    <p>&copy; 2025 BrandName. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+\`\`\`
+
+**Poin penting:**
+- **Mobile-first**: pakai media query \`\@media (max-width: 640px)\` untuk adjust mobile
+- **CSS Grid** dengan \`auto-fit\` + \`minmax\` bikin responsive otomatis tanpa breakpoint
+- **Sticky navbar** dengan \`backdrop-filter: blur\` efek modern
+- **Hemat dependency**: pure HTML/CSS, no framework, load cepat`
+  },
+  {
+    user: "Bikin komponen React untuk form login dengan validation",
+    assistant: `\`\`\`tsx
+// components/LoginForm.tsx
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().email('Email tidak valid'),
+  password: z.string().min(8, 'Password minimal 8 karakter'),
+});
+
+type LoginData = z.infer<typeof loginSchema>;
+
+interface LoginFormProps {
+  onSubmit: (data: LoginData) => Promise<void>;
+  loading?: boolean;
+}
+
+export function LoginForm({ onSubmit, loading }: LoginFormProps) {
+  const [serverError, setServerError] = useState<string>('');
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+  });
+  
+  const submit = async (data: LoginData) => {
+    setServerError('');
+    try {
+      await onSubmit(data);
+    } catch (err: any) {
+      setServerError(err.message || 'Login gagal');
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(submit)} className="space-y-4 max-w-sm mx-auto p-6">
+      <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+      
+      {serverError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded">
+          {serverError}
+        </div>
+      )}
+      
+      <div>
+        <label className="block text-sm font-medium mb-1">Email</label>
+        <input
+          {...register('email')}
+          type="email"
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="kamu@example.com"
+        />
+        {errors.email && (
+          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+        )}
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-1">Password</label>
+        <input
+          {...register('password')}
+          type="password"
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="********"
+        />
+        {errors.password && (
+          <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+        )}
+      </div>
+      
+      <button
+        type="submit"
+        disabled={isSubmitting || loading}
+        className="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-50"
+      >
+        {isSubmitting || loading ? 'Loading...' : 'Login'}
+      </button>
+    </form>
+  );
+}
+\`\`\`
+
+**Pakai:**
+\`\`\`tsx
+<LoginForm onSubmit={async (data) => {
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Email atau password salah');
+}} />
+\`\`\`
+
+**Kenapa pakai react-hook-form + zod:**
+- **Performance**: react-hook-form tidak re-render saat user ngetik (unlike controlled inputs)
+- **Type safety**: zod schema = source of truth untuk type + validation
+- **UX**: error message muncul real-time, disable button saat loading
+- **Accessibility**: label terhubung otomatis dengan input via htmlFor`
+  },
+  {
+    user: "Bikin Next.js API route untuk upload file ke S3",
+    assistant: `\`\`\`typescript
+// app/api/upload/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+
+// Inisialisasi S3 client (singleton)
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+
+export async function POST(req: NextRequest) {
+  try {
+    // 1. Auth check
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    // 2. Parse form data
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+    
+    if (!file) {
+      return NextResponse.json({ error: 'File tidak ditemukan' }, { status: 400 });
+    }
+    
+    // 3. Validate file
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: 'File terlalu besar. Maksimal 5MB.' },
+        { status: 413 }
+      );
+    }
+    
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: \`Tipe file tidak didukung: \${file.type}\` },
+        { status: 415 }
+      );
+    }
+    
+    // 4. Generate unique filename
+    const ext = file.name.split('.').pop();
+    const filename = \`\${session.user.id}/\${Date.now()}-\${Math.random().toString(36).slice(2, 8)}.\${ext}\`;
+    
+    // 5. Upload ke S3
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await s3Client.send(new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME!,
+      Key: filename,
+      Body: buffer,
+      ContentType: file.type,
+      // ACL: 'public-read', // kalau mau public. Untuk private, generate presigned URL.
+    }));
+    
+    // 6. Return URL
+    const url = \`https://\${process.env.S3_BUCKET_NAME}.s3.\${process.env.AWS_REGION}.amazonaws.com/\${filename}\`;
+    
+    return NextResponse.json({ url, filename });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      { error: 'Gagal upload file' },
+      { status: 500 }
+    );
+  }
+}
+\`\`\`
+
+**Frontend (React):**
+\`\`\`tsx
+async function uploadFile(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+    // JANGAN set Content-Type header manual! Browser akan set otomatis dengan boundary.
+  });
+  
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error);
+  }
+  
+  return await res.json(); // { url, filename }
+}
+\`\`\`
+
+**Setup environment (\`.env.local\`):**
+\`\`\`
+AWS_REGION=ap-southeast-1
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+S3_BUCKET_NAME=your-bucket
+\`\`\`
+
+**Tips:**
+- Untuk file besar (>5MB), pakai **presigned URL** — upload langsung dari frontend ke S3, lewat server
+- Untuk image, pertimbangkan pakai \`sharp\` untuk resize/compress sebelum upload
+- Selalu validate di server, jangan percaya client validation saja`
+  },
+  {
+    user: "Cara bikin navbar responsive dengan hamburger menu di React",
+    assistant: `\`\`\`tsx
+// components/Navbar.tsx
+import { useState, useEffect } from 'react';
+
+const navLinks = [
+  { href: '#home', label: 'Beranda' },
+  { href: '#features', label: 'Fitur' },
+  { href: '#pricing', label: 'Harga' },
+  { href: '#contact', label: 'Kontak' },
+];
+
+export function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  
+  // Close menu saat resize ke desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setIsOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Add background saat scroll
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  return (
+    <nav className={\`fixed top-0 left-0 right-0 z-50 transition-all \${
+      scrolled ? 'bg-white/95 backdrop-blur shadow-md' : 'bg-transparent'
+    }\`}>
+      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+        {/* Logo */}
+        <a href="#home" className="text-xl font-bold text-gray-900">
+          BrandName
+        </a>
+        
+        {/* Desktop menu */}
+        <div className="hidden md:flex gap-6">
+          {navLinks.map(link => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
+          <button className="bg-blue-600 text-white px-4 py-1.5 rounded font-medium hover:bg-blue-700">
+            Login
+          </button>
+        </div>
+        
+        {/* Hamburger button (mobile) */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden p-2"
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {isOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+      </div>
+      
+      {/* Mobile menu */}
+      {isOpen && (
+        <div className="md:hidden bg-white border-t">
+          <div className="px-4 py-2 space-y-1">
+            {navLinks.map(link => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className="block py-2 text-gray-600 hover:text-gray-900 font-medium"
+              >
+                {link.label}
+              </a>
+            ))}
+            <button className="w-full text-left py-2 text-blue-600 font-medium">
+              Login
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}
+\`\`\`
+
+**Poin penting:**
+- **\`md:hidden\`** = hamburger button hanya tampil di mobile (<768px)
+- **\`hidden md:flex\`** = desktop menu hanya tampil di >=768px
+- **Close menu saat klik link** dengan \`onClick={() => setIsOpen(false)}\`
+- **Close saat resize ke desktop** supaya state tidak nyangkut
+- **Add background saat scroll** untuk readability (efek navbar transparent → solid)
+- **aria-label** untuk accessibility (screen reader)
+
+**Tanpa Tailwind (pakai CSS biasa):**
+\`\`\`css
+.hamburger { display: block; }
+@media (min-width: 768px) {
+  .hamburger { display: none; }
+  .desktop-menu { display: flex; }
+}
+.desktop-menu { display: none; }
+\`\`\``
+  },
+  {
+    user: "Bikin carousel/slider image di React tanpa library",
+    assistant: `\`\`\`tsx
+// components/Carousel.tsx
+import { useState, useEffect, useCallback } from 'react';
+
+interface CarouselProps {
+  images: { src: string; alt: string; caption?: string }[];
+  autoPlay?: boolean;
+  interval?: number; // ms
+}
+
+export function Carousel({ images, autoPlay = true, interval = 5000 }: CarouselProps) {
+  const [current, setCurrent] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  
+  const next = useCallback(() => {
+    setCurrent(c => (c + 1) % images.length);
+  }, [images.length]);
+  
+  const prev = () => {
+    setCurrent(c => (c - 1 + images.length) % images.length);
+  };
+  
+  // Auto-play
+  useEffect(() => {
+    if (!autoPlay || isPaused) return;
+    const timer = setInterval(next, interval);
+    return () => clearInterval(timer);
+  }, [autoPlay, isPaused, interval, next]);
+  
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [next]);
+  
+  if (images.length === 0) return null;
+  
+  return (
+    <div
+      className="relative w-full max-w-3xl mx-auto overflow-hidden rounded-lg"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Slides */}
+      <div
+        className="flex transition-transform duration-500 ease-out"
+        style={{ transform: \`translateX(-\${current * 100}%)\` }}
+      >
+        {images.map((img, i) => (
+          <div key={i} className="w-full flex-shrink-0 relative">
+            <img
+              src={img.src}
+              alt={img.alt}
+              className="w-full h-64 md:h-96 object-cover"
+            />
+            {img.caption && (
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4">
+                {img.caption}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      
+      {/* Prev button */}
+      <button
+        onClick={prev}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full"
+        aria-label="Previous"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      
+      {/* Next button */}
+      <button
+        onClick={next}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full"
+        aria-label="Next"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+      
+      {/* Dots indicator */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={\`w-2 h-2 rounded-full transition-all \${
+              i === current ? 'bg-white w-6' : 'bg-white/50'
+            }\`}
+            aria-label={\`Go to slide \${i + 1}\`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+\`\`\`
+
+**Pakai:**
+\`\`\`tsx
+<Carousel
+  images={[
+    { src: '/img1.jpg', alt: 'Slide 1', caption: 'Caption 1' },
+    { src: '/img2.jpg', alt: 'Slide 2', caption: 'Caption 2' },
+    { src: '/img3.jpg', alt: 'Slide 3' },
+  ]}
+  autoPlay
+  interval={5000}
+/>
+\`\`\`
+
+**Fitur:**
+- **Auto-play** dengan pause on hover
+- **Keyboard navigation** (arrow left/right)
+- **Touch-friendly** buttons (mobile)
+- **Dots indicator** untuk langsung loncat ke slide tertentu
+- **Smooth transition** dengan CSS \`transition-transform\`
+- **Accessibility**: aria-label untuk screen reader
+
+**Tips untuk production:**
+- Tambah \`loading="lazy"\` untuk image yang belum terlihat
+- Pakai \`<picture>\` + srcset untuk responsive images
+- Tambah swipe gesture untuk mobile (pakai \`onTouchStart\`/\`onTouchEnd\`)`
+  },
+  {
+    user: "Bikin dark mode toggle di Next.js dengan Tailwind",
+    assistant: `\`\`\`tsx
+// components/ThemeToggle.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export function ThemeToggle() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [mounted, setMounted] = useState(false);
+  
+  // Init theme dari localStorage atau system preference
+  useEffect(() => {
+    setMounted(true);
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initial = stored || (systemDark ? 'dark' : 'light');
+    setTheme(initial);
+    document.documentElement.classList.toggle('dark', initial === 'dark');
+  }, []);
+  
+  const toggle = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
+  
+  // Hydration mismatch fix
+  if (!mounted) {
+    return <div className="w-9 h-9" />; // placeholder same size
+  }
+  
+  return (
+    <button
+      onClick={toggle}
+      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      aria-label="Toggle theme"
+    >
+      {theme === 'light' ? (
+        // Sun icon
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ) : (
+        // Moon icon
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      )}
+    </button>
+  );
+}
+\`\`\`
+
+**Layout (\`app/layout.tsx\`):**
+\`\`\`tsx
+// Tambah script untuk set theme SEBELUM React hydrate (cegah flash)
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="id" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: \`
+          (function() {
+            const stored = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored === 'dark' || (!stored && systemDark)) {
+              document.documentElement.classList.add('dark');
+            }
+          })();
+        \`}} />
+      </head>
+      <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+        {children}
+      </body>
+    </html>
+  );
+}
+\`\`\`
+
+**\`tailwind.config.ts\`:**
+\`\`\`typescript
+import type { Config } from 'tailwindcss';
+
+export default {
+  darkMode: 'class', // penting! pakai class strategy
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
+  theme: { extend: {} },
+  plugins: [],
+} satisfies Config;
+\`\`\`
+
+**Pakai di komponen:**
+\`\`\`tsx
+<div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <p className="text-gray-600 dark:text-gray-300">
+    Ini teks yang adaptif theme
+  </p>
+</div>
+\`\`\`
+
+**Tips:**
+- **\`suppressHydrationWarning\`** di <html> untuk hindari warning React karena class diubah oleh script
+- **Script inline** di <head> mencegah flash of unstyled content (FOUC)
+- **\`mounted\` state** untuk hindari hydration mismatch (server render light, client render dark)
+- **System preference** sebagai fallback kalau user belum pilih`
+  },
+  {
+    user: "Bikin modal/dialog di React dengan aksesibilitas",
+    assistant: `\`\`\`tsx
+// components/Modal.tsx
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  children: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
+  
+  // Lock body scroll saat modal terbuka
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      previouslyFocused.current = document.activeElement as HTMLElement;
+      // Focus pertama element di modal
+      setTimeout(() => {
+        dialogRef.current?.focus();
+      }, 0);
+    } else {
+      document.body.style.overflow = '';
+      // Restore focus ke element sebelumnya
+      previouslyFocused.current?.focus();
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+  
+  // Close pada Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      // Trap focus di dalam modal
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0] as HTMLElement;
+        const last = focusable[focusable.length - 1] as HTMLElement;
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [isOpen, onClose]);
+  
+  if (!isOpen) return null;
+  
+  const sizeClass = {
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-2xl',
+  }[size];
+  
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'modal-title' : undefined}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      
+      {/* Modal content */}
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        className={\`relative bg-white rounded-lg shadow-xl w-full \${sizeClass} max-h-[90vh] overflow-hidden flex flex-col\`}
+      >
+        {title && (
+          <div className="px-6 py-4 border-b flex justify-between items-center">
+            <h2 id="modal-title" className="text-lg font-semibold">{title}</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 p-1"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+        
+        <div className="p-6 overflow-y-auto">
+          {children}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+\`\`\`
+
+**Pakai:**
+\`\`\`tsx
+const [isOpen, setIsOpen] = useState(false);
+
+<>
+  <button onClick={() => setIsOpen(true)}>Buka Modal</button>
+  <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Konfirmasi">
+    <p>Apakah Anda yakin ingin menghapus item ini?</p>
+    <div className="flex gap-2 mt-4 justify-end">
+      <button onClick={() => setIsOpen(false)} className="px-4 py-2 text-gray-600">
+        Batal
+      </button>
+      <button onClick={handleConfirm} className="px-4 py-2 bg-red-600 text-white rounded">
+        Hapus
+      </button>
+    </div>
+  </Modal>
+</>
+\`\`\`
+
+**Fitur aksesibilitas:**
+- **\`role="dialog"\`** + **\`aria-modal\`** untuk screen reader
+- **Focus trap** — Tab key stay di dalam modal
+- **Restore focus** ke element sebelumnya setelah close
+- **Escape key** untuk close
+- **Backdrop click** untuk close
+- **Body scroll lock** saat modal terbuka
+- **\`createPortal\`** untuk render di document.body (avoid z-index issue)
+
+**Tanpa library**, modal ini lebih powerful daripada kebanyakan library modal populer.`
+  },
+  {
+    user: "Tailwind vs CSS biasa, kapan pakai yang mana?",
+    assistant: `Tergantung tim, project, dan preferensi. Tapi secara umum:
+
+## Tailwind CSS — untuk project dynamic, fast-paced
+
+**Kelebihan:**
+- **No context switch** — styling langsung di JSX, tidak loncat ke file CSS
+- **Design system konsisten** — spacing, color, typography built-in
+- **Bundle kecil otomatis** — hanya class yang dipakai yang masuk bundle
+- **Responsive mudah** — \`md:flex\`, \`lg:grid-cols-3\` langsung jalan
+- **Dark mode trivial** — \`dark:bg-gray-900\`
+- **Refactor aman** — hapus class di JSX = hapus style, tidak ada CSS orphan
+
+**Kekurangan:**
+- **HTML jadi panjang** — \`className="flex items-center gap-4 px-6 py-4 bg-blue-600 hover:bg-blue-700"\`
+- **Learning curve** — harus hafal nama class Tailwind
+- **Sulit untuk styling dinamis kompleks** — kalau butuh banyak kondisi, CSS biasa lebih bersih
+- **Tidak cocok untuk tim yang baru** — perlu setup + training
+
+## CSS biasa (CSS Modules / styled-components) — untuk project complex
+
+**Kelebihan:**
+- **HTML bersih** — \`<button className="btn-primary">Submit</button>\`
+- **Styling dinamis mudah** — pakai variabel, fungsi, props
+- **Reuse pattern** — bisa bikin utility classes sendiri
+- **Tidak perlu build tooling khusus**
+
+**Kekurangan:**
+- **Context switch** — loncat antara JSX dan CSS file
+- **Bundle tidak optimal** — sulit tree-shake CSS
+- **Naming** — harus pikir nama class (BEM, atomic, dll)
+- **Responsive** — harus tulis media query manual
+
+## Saran berdasarkan use case
+
+| Use case | Rekomendasi |
+|----------|-------------|
+| Startup / MVP | **Tailwind** — dev speed penting |
+| Design system matang | **CSS Modules** — kontrol penuh |
+| Tim kecil / solo dev | **Tailwind** — produktif |
+| Tim besar | **CSS Modules + design tokens** — konsistensi |
+| Library komponen | **CSS Modules** — consumer bisa override |
+| Blog / static site | **CSS biasa** — simple, no build |
+| Enterprise app besar | **CSS Modules + Tailwind utility** — hybrid |
+
+## Hybrid approach (paling umum di production)
+
+\`\`\`tsx
+// Pakai CSS Module untuk komponen yang complex
+import styles from './Button.module.css';
+
+export function Button({ variant, children }) {
+  return (
+    <button className={\`\${styles.btn} \${styles[variant]}\`}>
+      {children}
+    </button>
+  );
+}
+
+// + Tailwind untuk layout & spacing di page level
+<div className="flex items-center gap-4 px-6 py-8 max-w-4xl mx-auto">
+  <Button variant="primary">Save</Button>
+</div>
+\`\`\`
+
+## Aturan praktis
+
+1. **Kalau ragu, pakai Tailwind** — lebih produktif untuk 80% kasus
+2. **Pisahkan ke CSS Module kalau** class > 10 atau ada banyak conditional
+3. **Jangan campur** dalam 1 komponen — pilih salah satu approach
+4. **Pakai \`cva\` (class-variance-authority)** kalau Tailwind bikin className kepanjangan:
+   \`\`\`tsx
+   const button = cva('px-4 py-2 rounded font-medium', {
+     variants: {
+       variant: {
+         primary: 'bg-blue-600 text-white hover:bg-blue-700',
+         secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+       },
+       size: { sm: 'text-sm', lg: 'text-lg px-6 py-3' }
+     }
+   });
+   \`\`\``
+  },
+  {
+    user: "Cara deploy Next.js ke Vercel",
+    assistant: `Vercel adalah creator Next.js, jadi deploy ke sana paling gampang dan optimal.
+
+## Cara 1: via GitHub (recommended, auto-deploy)
+
+1. **Push code ke GitHub**
+2. Buka **https://vercel.com** → login dengan GitHub
+3. Klik **"Add New Project"**
+4. Pilih repo Anda
+5. Vercel auto-detect Next.js, tinggal klik **"Deploy"**
+6. Tunggu 1-2 menit, langsung live di \`https://<project>.vercel.app\`
+
+Setiap push ke \`main\` branch → auto-deploy ke production.
+Setiap PR → preview deployment otomatis.
+
+## Cara 2: via Vercel CLI
+
+\`\`\`bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Login
+vercel login
+
+# Deploy dari folder project
+vercel
+
+# Untuk production deploy
+vercel --prod
+\`\`\`
+
+## Setup Environment Variables
+
+### Via Dashboard
+1. Project Settings → Environment Variables
+2. Add variable, pilih environment (Production / Preview / Development)
+3. Redeploy untuk apply
+
+### Via CLI
+\`\`\`bash
+vercel env add DATABASE_URL
+vercel env add NEXTAUTH_SECRET
+\`\`\`
+
+### Via \`vercel.json\` (jangan commit secrets!)
+\`\`\`json
+{
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "https://api.example.com"
+    }
+  }
+}
+\`\`\`
+
+## Custom Domain
+
+1. Project Settings → Domains
+2. Add domain: \`myapp.com\`
+3. Vercel kasih DNS records, tambahkan ke registrar
+4. SSL otomatis (Let's Encrypt)
+
+## Database Options
+
+Vercel tidak punya database bawaan, tapi integrasi mudah:
+- **Vercel Postgres** (Neon) — PostgreSQL serverless
+- **Vercel KV** (Upstash) — Redis compatible
+- **Vercel Blob** — file storage (S3-like)
+- **PlanetScale** — MySQL serverless
+- **Supabase** — PostgreSQL + Auth + Storage
+
+\`\`\`bash
+# Bikin Vercel Postgres
+vercel postgres create mydb
+
+# Pakai di Next.js
+import { sql } from '@vercel/postgres';
+const { rows } = await sql\`SELECT * FROM users WHERE id = \${userId}\`;
+\`\`\`
+
+## Optimasi untuk Production
+
+### \`next.config.js\`
+\`\`\`javascript
+const nextConfig = {
+  // Output standalone untuk Vercel (otomatis)
+  output: 'standalone',
+  
+  // Image optimization
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [{ protocol: 'https', hostname: '**' }],
+  },
+  
+  // Compression
+  compress: true,
+  
+  // Security headers
+  async headers() {
+    return [{
+      source: '/(.*)',
+      headers: [
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      ],
+    }];
+  },
+};
+\`\`\`
+
+## Edge Functions (optional)
+
+Next.js Edge Runtime = deploy function ke edge network (200+ lokasi):
+
+\`\`\`typescript
+export const runtime = 'edge';
+
+export default function handler(req: Request) {
+  return new Response(JSON.stringify({ hello: 'world' }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+\`\`\`
+
+Edge = latency rendah (5-50ms), tapi terbatas (no Node.js API, no DB connection pooling).
+
+## Monitoring
+
+- **Vercel Analytics** — Web Vitals, traffic (free untuk hobby)
+- **Vercel Speed Insights** — Core Web Vitals real user
+- **Sentry** — error tracking
+- **LogDrains** — kirim log ke Datadog / Logflare
+
+## Pricing
+
+- **Hobby** (gratis): 100GB bandwidth, 100GB-hours serverless, cukup untuk portfolio/blog kecil
+- **Pro** ($20/bln): 1TB bandwidth, lebih banyak serverless, no commercial limit
+- **Enterprise** ($150+/bln): SSO, SLA, dedicated support
+
+## Alternatif Vercel
+
+Kalau mau self-host atau avoid vendor lock-in:
+- **Netlify** — mirip Vercel, free tier generous
+- **Cloudflare Pages** — free unlimited bandwidth, lebih cepat global
+- **Railway** — full backend support, database bawaan
+- **Fly.io** — deploy ke multi-region, cocok untuk full-stack
+- **Self-host**: VPS (DigitalOcean/Hetzner) + Docker + Nginx
+
+**Saran:** Untuk Next.js project baru, mulai dengan Vercel. Simple, fast, integrasi mulus. Pindah kalau sudah butuh kontrol lebih atau cost naik.`
+  },
+  {
+    user: "Bikin animasi loading skeleton di React",
+    assistant: `\`\`\`tsx
+// components/Skeleton.tsx
+export function Skeleton({ className = '' }: { className?: string }) {
+  return (
+    <div className={\`animate-pulse bg-gray-200 rounded \${className}\`} />
+  );
+}
+
+// Pakai untuk card
+export function CardSkeleton() {
+  return (
+    <div className="p-4 border rounded-lg space-y-3">
+      <Skeleton className="h-40 w-full" /> {/* image */}
+      <Skeleton className="h-4 w-3/4" /> {/* title */}
+      <Skeleton className="h-3 w-full" /> {/* description */}
+      <Skeleton className="h-3 w-5/6" />
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-20" /> {/* button */}
+        <Skeleton className="h-8 w-20" />
+      </div>
+    </div>
+  );
+}
+
+// Pakai untuk list
+export function ListSkeleton({ count = 5 }: { count?: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex gap-3 p-3">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-3 w-3/4" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Pakai untuk table
+export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
+  return (
+    <div className="space-y-2">
+      <div className="grid gap-2" style={{ gridTemplateColumns: \`repeat(\${cols}, 1fr)\` }}>
+        {Array.from({ length: cols }).map((_, i) => (
+          <Skeleton key={i} className="h-8" />
+        ))}
+      </div>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="grid gap-2" style={{ gridTemplateColumns: \`repeat(\${cols}, 1fr)\` }}>
+          {Array.from({ length: cols }).map((_, j) => (
+            <Skeleton key={j} className="h-6" />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+\`\`\`
+
+**CSS untuk shimmer effect (lebih keren dari pulse):**
+\`\`\`css
+/* globals.css */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+\`\`\`
+
+\`\`\`tsx
+export function SkeletonShimmer({ className = '' }: { className?: string }) {
+  return <div className={\`skeleton-shimmer rounded \${className}\`} />;
+}
+\`\`\`
+
+**Pakai dengan React Suspense:**
+\`\`\`tsx
+import { Suspense } from 'react';
+
+export function ProductsPage() {
+  return (
+    <div>
+      <h1>Products</h1>
+      <Suspense fallback={<ListSkeleton count={8} />}>
+        <ProductList />
+      </Suspense>
+    </div>
+  );
+}
+
+async function ProductList() {
+  const products = await fetchProducts(); // async data fetch
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {products.map(p => <ProductCard key={p.id} product={p} />)}
+    </div>
+  );
+}
+\`\`\`
+
+**Tips:**
+- **Skeleton harus match layout** real content — supaya tidak layout shift (CLS)
+- **Pakai shimmer** untuk terlihat lebih premium dari pulse biasa
+- **Stagger animation** (delay per item) untuk efek lebih natural
+- **Jangan terlalu cepat** — kalau data load dalam 200ms, skip skeleton (cuma bikin flicker)
+- **Pakai \`min-h\`** supaya skeleton tidak collapse saat content kosong
+
+**Tanpa Tailwind:**
+\`\`\`css
+.skeleton {
+  background: #e5e7eb;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+\`\`\``
+  },
+  {
+    user: "Cara bikin infinite scroll di React",
+    assistant: `\`\`\`tsx
+// hooks/useInfiniteScroll.ts
+import { useEffect, useRef, useState, useCallback } from 'react';
+
+interface UseInfiniteScrollOptions {
+  fetchMore: (page: number) => Promise<{ data: any[]; hasMore: boolean }>;
+  threshold?: number; // px dari bottom untuk trigger
+  initialPage?: number;
+}
+
+export function useInfiniteScroll({ fetchMore, threshold = 100, initialPage = 1 }: UseInfiniteScrollOptions) {
+  const [data, setData] = useState<any[]>([]);
+  const [page, setPage] = useState(initialPage);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fetchMore(page);
+      setData(prev => [...prev, ...result.data]);
+      setHasMore(result.hasMore);
+      setPage(p => p + 1);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchMore, page, loading, hasMore]);
+  
+  // IntersectionObserver untuk trigger
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { rootMargin: \`\${threshold}px\` }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore, hasMore, loading, threshold]);
+  
+  return { data, loading, error, hasMore, sentinelRef, loadMore };
+}
+\`\`\`
+
+**Pakai:**
+\`\`\`tsx
+function PostList() {
+  const { data: posts, loading, hasMore, sentinelRef, error } = useInfiniteScroll({
+    fetchMore: async (page) => {
+      const res = await fetch(\`/api/posts?page=\${page}\`);
+      const json = await res.json();
+      return { data: json.posts, hasMore: json.hasMore };
+    },
+    threshold: 200,
+  });
+  
+  return (
+    <div>
+      {posts.map(post => (
+        <article key={post.id} className="p-4 border-b">
+          <h3>{post.title}</h3>
+          <p>{post.excerpt}</p>
+        </article>
+      ))}
+      
+      {/* Sentinel element - trigger load saat terlihat */}
+      <div ref={sentinelRef} className="h-4" />
+      
+      {loading && <div className="p-4 text-center">Loading...</div>}
+      {error && <div className="p-4 text-red-500">Error: {error}</div>}
+      {!hasMore && <div className="p-4 text-center text-gray-500">Sudah semua ✨</div>}
+    </div>
+  );
+}
+\`\`\`
+
+**Tips:**
+- **IntersectionObserver** lebih efisien dari scroll event (no layout thrashing)
+- **\`rootMargin\`** = preload sebelum user benar-benar sampai bottom
+- **Debounce kalau pakai scroll event**: jangan trigger lebih dari 1x per 200ms
+- **Cancel request** kalau user scroll cepat: pakai AbortController
+- **Empty state**: tampilkan sesuatu kalau \`data.length === 0\` dan tidak loading
+- **Error recovery**: tombol "Coba lagi" kalau error
+
+**Virtual scrolling untuk list panjang (>1000 items):**
+\`\`\`tsx
+// Hanya render items yang terlihat di viewport
+import { useVirtualizer } from '@tanstack/react-virtual';
+
+function BigList({ items }) {
+  const parentRef = useRef(null);
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 60,
+    overscan: 5,
+  });
+  
+  return (
+    <div ref={parentRef} style={{ height: 600, overflow: 'auto' }}>
+      <div style={{ height: virtualizer.getTotalSize() }}>
+        {virtualizer.getVirtualItems().map(item => (
+          <div
+            key={item.key}
+            style={{
+              position: 'absolute',
+              top: item.start,
+              height: item.size,
+            }}
+          >
+            {items[item.index].title}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+\`\`\`
+
+Virtual scroll = render hanya 5-10 items yang terlihat, bukan 1000. Hemat memory & cepat.`
+  },
 ];
 
 // Write to file

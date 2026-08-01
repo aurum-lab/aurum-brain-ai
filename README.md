@@ -29,32 +29,28 @@ File yang dibutuhkan:
 
 ## 📱 Cara Pakai
 
+### Termux (HP Android) — AI lokal dengan custom provider
+Lihat **[docs/TERMUX.md](docs/TERMUX.md)** untuk panduan lengkap.
+
+Quick install:
+```bash
+# Di Termux (install dari F-Droid, bukan Play Store)
+curl -sL https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/scripts/install-termux.sh -o install-aurum.sh
+bash install-aurum.sh
+```
+
+Setelah install, AI jalan sebagai **server lokal** di `http://localhost:8080` dengan API OpenAI-compatible. Bisa dipakai sebagai:
+- **Custom provider di OpenClaw** — chat di app Android
+- **Open WebUI** — UI web seperti ChatGPT
+- **Cherry Studio** — desktop client (Windows/Mac/Linux)
+- **VSCode Continue** — AI coding assistant di editor
+- **App lain** yang support OpenAI API
+
 ### PocketPal (HP — paling gampang)
 Lihat **[docs/POCKETPAL.md](docs/POCKETPAL.md)** untuk panduan lengkap.
 
-Quick start:
-1. Install **PocketPal** dari App Store / Play Store
-2. Download GGUF dari Releases
-3. Import file ke PocketPal
-4. Set system prompt dari `system_prompt.txt`
-5. Mulai chat!
-
 ### Ollama (Mac/Linux/Windows)
 Lihat **[docs/OLLAMA.md](docs/OLLAMA.md)**.
-
-```bash
-# Clone repo + download GGUF
-git clone https://github.com/aurum-lab/aurum-brain-ai.git
-cd aurum-brain-ai
-
-# Download GGUF ke folder ini (ganti URL dengan release terbaru)
-curl -L -o aurum-brain-q4_k_m.gguf \
-  https://github.com/aurum-lab/aurum-brain-ai/releases/latest/download/aurum-brain-q4_k_m.gguf
-
-# Create & run
-ollama create aurum-brain -f modelfile
-ollama run aurum-brain
-```
 
 ### LM Studio (GUI)
 Lihat **[docs/LMSTUDIO.md](docs/LMSTUDIO.md)**.
@@ -70,15 +66,18 @@ Lihat **[docs/LMSTUDIO.md](docs/LMSTUDIO.md)**.
 aurum-brain-ai/
 ├── data/
 │   ├── system_prompt.txt              # Personality AI (IQ tinggi, jago coding)
-│   ├── conversations_source.json      # 28+ percakapan Bahasa Indonesia
+│   ├── conversations_source.json      # 39 percakapan Bahasa Indonesia
 │   └── train.jsonl                    # Dataset format ChatML (auto-generated)
 ├── scripts/
 │   ├── generate_source.js             # Generator dataset (Node.js)
 │   ├── build_dataset.py               # Builder JSONL dari source
-│   └── train.py                       # LoRA fine-tuning script
+│   ├── train.py                       # LoRA fine-tuning script
+│   └── install-termux.sh              # Installer untuk Termux (Android)
 ├── .github/workflows/
-│   └── train.yml                      # Auto-train + release GGUF
+│   ├── train.yml                      # Auto-train + release GGUF
+│   └── starter-release.yml            # Starter model (Qwen2.5-1.5B) cepat
 ├── docs/
+│   ├── TERMUX.md                      # Install di Termux (HP Android)
 │   ├── POCKETPAL.md                   # Import ke PocketPal (HP)
 │   ├── OLLAMA.md                      # Pakai dengan Ollama
 │   ├── LMSTUDIO.md                    # Pakai dengan LM Studio
@@ -117,24 +116,41 @@ Detail lengkap di **[data/system_prompt.txt](data/system_prompt.txt)**.
 
 ## 📊 Dataset Training
 
-28 percakapan Bahasa Indonesia berkualitas tinggi, mencakup:
+39 percakapan Bahasa Indonesia berkualitas tinggi, mencakup:
 
+**Programming Languages:**
 - **Python**: list/tuple/set, decorator, performance optimization
 - **JavaScript/TypeScript**: var/let/const, debounce, async/await
 - **Rust**: ownership, borrowing
 - **Go**: goroutine, channel
 - **SQL**: index, query optimization
-- **Debugging**: NoneType error, common pitfalls
-- **React**: useEffect, hooks
-- **Architecture**: microservices vs monolith
-- **Database**: SQL vs NoSQL
-- **Git**: rebase vs merge
-- **DevOps**: Docker compose
-- **Security**: password hashing
-- **Algorithm**: Big O, hash table
-- **API Design**: REST best practices
-- **Testing**: unit vs integration test
-- **Percakapan umum**: siapa kamu, makna hidup, belajar programming
+
+**Web Development (khusus untuk bikin website):**
+- Landing page HTML/CSS responsive
+- Form login dengan validation (React + Zod)
+- Next.js API route untuk upload file ke S3
+- Navbar responsive dengan hamburger menu
+- Carousel/slider image tanpa library
+- Dark mode toggle di Next.js + Tailwind
+- Modal/dialog dengan aksesibilitas (focus trap, ARIA)
+- Tailwind vs CSS biasa comparison
+- Deploy Next.js ke Vercel
+- Loading skeleton dengan shimmer effect
+- Infinite scroll dengan IntersectionObserver
+
+**Software Engineering:**
+- Debugging: NoneType error, common pitfalls
+- Architecture: microservices vs monolith
+- Database: SQL vs NoSQL
+- Git: rebase vs merge
+- DevOps: Docker compose
+- Security: password hashing
+- Algorithm: Big O, hash table
+- API Design: REST best practices
+- Testing: unit vs integration test
+
+**Percakapan Umum:**
+- Siapa kamu, makna hidup, belajar programming
 
 Tambah data Anda sendiri di **`scripts/generate_source.js`**.
 
