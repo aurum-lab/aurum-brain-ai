@@ -30,13 +30,14 @@ File yang dibutuhkan:
 ## 📱 Cara Pakai
 
 ### Termux (HP Android) — AI lokal dengan custom provider
-Lihat **[docs/TERMUX.md](docs/TERMUX.md)** untuk panduan lengkap.
+Installer & tools Termux sudah dipindah ke repo terpisah:
+
+👉 **https://github.com/aurum-lab/aurum-termux**
 
 Quick install:
 ```bash
 # Di Termux (install dari F-Droid, bukan Play Store)
-curl -sL https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/scripts/install-termux.sh -o install-aurum.sh
-bash install-aurum.sh
+curl -sL https://raw.githubusercontent.com/aurum-lab/aurum-termux/main/install.sh | bash
 ```
 
 Setelah install, AI jalan sebagai **server lokal** di `http://localhost:8080` dengan API OpenAI-compatible. Bisa dipakai sebagai:
@@ -71,13 +72,11 @@ aurum-brain-ai/
 ├── scripts/
 │   ├── generate_source.js             # Generator dataset (Node.js)
 │   ├── build_dataset.py               # Builder JSONL dari source
-│   ├── train.py                       # LoRA fine-tuning script
-│   └── install-termux.sh              # Installer untuk Termux (Android)
+│   └── train.py                       # LoRA fine-tuning script
 ├── .github/workflows/
 │   ├── train.yml                      # Auto-train + release GGUF
 │   └── starter-release.yml            # Starter model (Qwen2.5-1.5B) cepat
 ├── docs/
-│   ├── TERMUX.md                      # Install di Termux (HP Android)
 │   ├── POCKETPAL.md                   # Import ke PocketPal (HP)
 │   ├── OLLAMA.md                      # Pakai dengan Ollama
 │   ├── LMSTUDIO.md                    # Pakai dengan LM Studio
@@ -85,6 +84,9 @@ aurum-brain-ai/
 ├── modelfile                          # Ollama modelfile
 └── README.md
 ```
+
+**Note:** Untuk install di Termux (HP Android), lihat repo terpisah:
+**[aurum-lab/aurum-termux](https://github.com/aurum-lab/aurum-termux)**
 
 ## 🧬 Spesifikasi Model
 
