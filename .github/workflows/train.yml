@@ -53,9 +53,11 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/ggerganov/llama.cpp
           cd llama.cpp
-          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF
-          cmake --build build --config Release -j $(nproc) --target quantize
-          echo "Quantize binary built: $(ls -la build/bin/quantize)"
+          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+          cmake --build build --config Release -j $(nproc) --target llama-quantize
+          # Buat symlink dengan nama lama untuk kompatibilitas script train.py
+          ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
+          ls -la build/bin/ | grep -i quantize
 
       - name: Train model (LoRA fine-tuning)
         env:

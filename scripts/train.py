@@ -252,11 +252,25 @@ def convert_to_gguf():
     
     # Quantize ke Q4_K_M (optimal untuk mobile)
     print("   Quantize F16 -> Q4_K_M...")
-    quantize_bin = llama_cpp_dir / "build" / "bin" / "quantize"
-    if not quantize_bin.exists():
-        # Fallback: cari di path lain
-        quantize_bin = llama_cpp_dir / "quantize"
+    # Cari binary quantize (nama berbeda di versi llama.cpp baru vs lama)
+    quantize_bin = None
+    for name in ["llama-quantize", "quantize"]:
+        path = llama_cpp_dir / "build" / "bin" / name
+        if path.exists():
+            quantize_bin = path
+            break
+    if not quantize_bin:
+        # Fallback: cari di root llama.cpp
+        for name in ["llama-quantize", "quantize"]:
+            path = llama_cpp_dir / name
+            if path.exists():
+                quantize_bin = path
+                break
     
+    if not quantize_bin:
+        raise RuntimeError("quantize binary tidak ditemukan. Build llama.cpp dulu.")
+    
+    print(f"   Using quantize binary: {quantize_bin}")
     subprocess.run([
         str(quantize_bin),
         str(f16_gguf),
