@@ -1,0 +1,113 @@
+name: Quick Release - Starter Model (Qwen2.5-1.5B Q4)
+
+# Workflow ini untuk bikin "starter" GGUF cepat (~1GB) - 
+# user bisa langsung download sambil nunggu full training selesai.
+# Pakai Qwen2.5-1.5B-Instruct (sudah pintar Bahasa Indonesia) tanpa fine-tune.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  quick-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip huggingface_hub
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential cmake git
+
+      - name: Download pre-quantized Qwen2.5-1.5B Q4_K_M dari HF
+        run: |
+          mkdir -p out
+          # Qwen official sudah provide pre-quantized GGUF
+          python3 << 'EOF'
+          from huggingface_hub import hf_hub_download
+          import shutil
+          
+          # Download pre-quantized GGUF dari Qwen official
+          path = hf_hub_download(
+              repo_id="Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+              filename="qwen2.5-1.5b-instruct-q4_k_m.gguf",
+              local_dir=".",
+          )
+          shutil.copy(path, "out/aurum-brain-starter-q4_k_m.gguf")
+          print(f"Downloaded: {path}")
+          EOF
+          ls -la out/
+
+      - name: Build llama.cpp untuk verify
+        run: |
+          git clone --depth 1 https://github.com/ggerganov/llama.cpp
+          cd llama.cpp
+          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+          cmake --build build --config Release -j $(nproc) --target llama-quantize
+          ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
+
+      - name: Verify GGUF
+        run: |
+          python3 -c "
+          import struct
+          with open('out/aurum-brain-starter-q4_k_m.gguf', 'rb') as f:
+            magic = f.read(4)
+            print(f'Magic: {magic}')
+            assert magic == b'GGUF', 'Invalid GGUF'
+            version = struct.unpack('<I', f.read(4))[0]
+            print(f'Version: {version}')
+          "
+          ls -la out/
+
+      - name: Create Starter Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER="starter-v$(date +%Y.%m.%d)"
+          gh release create "$VER" \
+            out/aurum-brain-starter-q4_k_m.gguf \
+            data/system_prompt.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Aurum Brain AI Starter $VER (Qwen2.5-1.5B Q4)" \
+            --notes "$(cat <<EOF
+          ## Aurum Brain AI - Starter Model
+
+          **PENTING:** Ini adalah starter model (Qwen2.5-1.5B tanpa fine-tune).
+          Untuk versi full fine-tuned Aurum Brain AI, tunggu release "v*.*.*" (bukan "starter-*").
+
+          ### Spesifikasi
+          - Base: Qwen/Qwen2.5-1.5B-Instruct (tanpa fine-tune)
+          - Quantization: Q4_K_M (~1GB)
+          - Sudah pintar Bahasa Indonesia & coding dari base model
+          - Personality AI: set system prompt dari \`system_prompt.txt\`
+
+          ### Cara Pakai
+          1. Download \`aurum-brain-starter-q4_k_m.gguf\` (~1GB)
+          2. Download \`system_prompt.txt\`
+          3. Import ke PocketPal (lihat docs/POCKETPAL.md)
+          4. Set system prompt di Settings
+          5. Mulai chat!
+
+          ### Beda dengan Full Version
+          | Aspek | Starter (ini) | Full Version |
+          |-------|---------------|--------------|
+          | Base | Qwen2.5-1.5B | Qwen2.5-3B |
+          | Fine-tune | Tidak | LoRA r=32 |
+          | Size | ~1GB | ~2GB |
+          | Bahasa Indonesia | Default multilingual | Fine-tuned khusus |
+          | Personality | From system prompt only | Baked in via fine-tune |
+          | Speed (mobile) | Cepat (5-10s) | Sedang (10-30s) |
+
+          Untuk HP lama atau RAM kecil (<4GB), pakai starter ini.
+          Untuk hasil terbaik, tunggu full version.
+          EOF
+          )"
