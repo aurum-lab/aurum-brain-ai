@@ -26,22 +26,23 @@ os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 # Konfigurasi - bisa di-override via environment variable
-BASE_MODEL = os.environ.get("AURUM_BASE_MODEL", "Qwen/Qwen2.5-3B-Instruct")
+# Default ke 1.5B (lebih cepat, ~15-30 menit) — bisa override ke 3B via env
+BASE_MODEL = os.environ.get("AURUM_BASE_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")
 DATA_PATH = Path(__file__).parent.parent / "data" / "train.jsonl"
 OUT_DIR = Path(__file__).parent.parent / "out"
 ADAPTER_DIR = OUT_DIR / "adapter"
 MERGED_DIR = OUT_DIR / "merged"
 GGUF_PATH = OUT_DIR / "aurum-brain-q4_k_m.gguf"
 
-# LoRA config - r=32 untuk balance capacity vs memory
-LORA_R = int(os.environ.get("LORA_R", "32"))
-LORA_ALPHA = int(os.environ.get("LORA_ALPHA", "64"))
+# LoRA config - r=16 untuk hemat memory + cepat
+LORA_R = int(os.environ.get("LORA_R", "16"))
+LORA_ALPHA = int(os.environ.get("LORA_ALPHA", "32"))
 LORA_DROPOUT = float(os.environ.get("LORA_DROPOUT", "0.05"))
-EPOCHS = int(os.environ.get("EPOCHS", "3"))
-BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "2"))
+EPOCHS = int(os.environ.get("EPOCHS", "2"))
+BATCH_SIZE = int(os.environ.get("BATCH_SIZE", "1"))
 GRAD_ACCUM = int(os.environ.get("GRAD_ACCUM", "4"))
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "2e-4"))
-MAX_LEN = int(os.environ.get("MAX_LEN", "1024"))
+MAX_LEN = int(os.environ.get("MAX_LEN", "768"))
 
 
 def load_and_tokenize(tokenizer, path, max_len=1024):

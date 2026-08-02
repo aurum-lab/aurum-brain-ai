@@ -10,13 +10,13 @@ on:
   workflow_dispatch:
     inputs:
       base_model:
-        description: 'Base model (default: Qwen/Qwen2.5-3B-Instruct)'
+        description: 'Base model (default: Qwen2.5-1.5B-Instruct, lebih cepat)'
         required: false
-        default: 'Qwen/Qwen2.5-3B-Instruct'
+        default: 'Qwen/Qwen2.5-1.5B-Instruct'
       epochs:
-        description: 'Training epochs (default: 3)'
+        description: 'Training epochs (default: 2)'
         required: false
-        default: '3'
+        default: '2'
 
 permissions:
   contents: write
@@ -24,7 +24,7 @@ permissions:
 jobs:
   train:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240  # 4 jam, sisa banyak untuk safety margin
     steps:
       - uses: actions/checkout@v4
 
@@ -33,16 +33,21 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Free disk space
+        run: |
+          # Hapus stuff yang tidak dipakai untuk hemat space
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h
+
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          # Install PyTorch (CPU version, lebih stabil di CI)
+          # PyTorch CPU version
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install transformers + LoRA + dataset
           pip install transformers peft datasets accelerate sentencepiece protobuf
-          # Install llama.cpp build deps
           sudo apt-get update -qq
           sudo apt-get install -y -qq build-essential cmake git
+          df -h
 
       - name: Build dataset
         run: |
@@ -54,19 +59,31 @@ jobs:
           git clone --depth 1 https://github.com/ggerganov/llama.cpp
           cd llama.cpp
           cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
-          cmake --build build --config Release -j $(nproc) --target llama-quantize
-          # Buat symlink dengan nama lama untuk kompatibilitas script train.py
+          cmake --build build --config Release -j 2 --target llama-quantize
           ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
           ls -la build/bin/ | grep -i quantize
 
       - name: Train model (LoRA fine-tuning)
         env:
-          AURUM_BASE_MODEL: ${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-3B-Instruct' }}
-          EPOCHS: ${{ github.event.inputs.epochs || '3' }}
+          # Default ke model 1.5B supaya cepat (15-30 menit)
+          # Bisa override via workflow_dispatch input
+          AURUM_BASE_MODEL: ${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-1.5B-Instruct' }}
+          EPOCHS: ${{ github.event.inputs.epochs || '2' }}
           BATCH_SIZE: '1'
-          GRAD_ACCUM: '8'
-          MAX_LEN: '1024'
+          GRAD_ACCUM: '4'
+          MAX_LEN: '768'
+          LORA_R: '16'
+          LORA_ALPHA: '32'
         run: |
+          echo "=== Training config ==="
+          echo "Base: $AURUM_BASE_MODEL"
+          echo "Epochs: $EPOCHS"
+          echo "Max len: $MAX_LEN"
+          echo "LoRA r=$LORA_R, alpha=$LORA_ALPHA"
+          echo ""
+          echo "=== Free memory before training ==="
+          free -h
+          echo ""
           python scripts/train.py
 
       - name: Verify GGUF output
@@ -77,61 +94,16 @@ jobs:
             exit 1
           fi
           echo "GGUF size: $(du -h out/aurum-brain-q4_k_m.gguf)"
-          # Quick smoke test: parse GGUF header
           python3 -c "
           import struct
           with open('out/aurum-brain-q4_k_m.gguf', 'rb') as f:
             magic = f.read(4)
-            print(f'Magic: {magic} (expected: GGUF)')
+            print(f'Magic: {magic}')
             assert magic == b'GGUF', 'Invalid GGUF file'
             version = struct.unpack('<I', f.read(4))[0]
             print(f'Version: {version}')
             print('OK GGUF valid')
           "
-
-      - name: Generate model card
-        run: |
-          cat > out/MODEL_CARD.md << 'EOF'
-          # Aurum Brain AI
-
-          Custom fine-tuned model dari Qwen2.5-3B-Instruct untuk Bahasa Indonesia.
-
-          ## Spesifikasi
-          - Base: Qwen/Qwen2.5-3B-Instruct
-          - Fine-tune: LoRA r=32, alpha=64
-          - Quantization: Q4_K_M
-          - Format: GGUF (llama.cpp compatible)
-          - Size: ~2GB
-
-          ## Kemampuan
-          - Bahasa Indonesia natural
-          - Coding expert (Python, JS, Rust, Go, SQL, dll)
-          - Software engineering consultation
-          - Problem solving & debugging
-
-          ## Cara Pakai
-
-          ### PocketPal (iOS/Android)
-          1. Download file `.gguf` ini
-          2. Buka PocketPal app
-          3. Tap "+" → "Import from file" → pilih file GGUF
-          4. Set system prompt ke isi `data/system_prompt.txt`
-          5. Mulai chat!
-
-          ### Ollama
-          ```bash
-          ollama create aurum-brain -f modelfile
-          ollama run aurum-brain
-          ```
-
-          ### llama.cpp
-          ```bash
-          ./main -m aurum-brain-q4_k_m.gguf -p "Halo, siapa kamu?"
-          ```
-
-          ## Disclaimer
-          Bukan saran finansial/legal/medis. Model bisa salah - selalu verify informasi penting.
-          EOF
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -139,7 +111,6 @@ jobs:
           name: aurum-brain-gguf
           path: |
             out/aurum-brain-q4_k_m.gguf
-            out/MODEL_CARD.md
             data/system_prompt.txt
           retention-days: 90
 
@@ -148,35 +119,39 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VER="v$(date +%Y.%m.%d)-${GITHUB_SHA::7}"
+          DATASET_SIZE=$(wc -l < data/train.jsonl)
+          BASE_MODEL="${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-1.5B-Instruct' }}"
+          
           gh release create "$VER" \
             out/aurum-brain-q4_k_m.gguf \
-            out/MODEL_CARD.md \
             data/system_prompt.txt \
             --repo "$GITHUB_REPOSITORY" \
             --title "Aurum Brain AI $VER" \
-            --notes "$(cat <<EOF
-          ## Aurum Brain AI - Custom Fine-Tuned Model
+            --notes "## Aurum Brain AI - Custom Fine-Tuned Model
 
-          Model AI buatan sendiri, fine-tuned dari Qwen2.5-3B-Instruct untuk Bahasa Indonesia.
+Model AI buatan sendiri, fine-tuned untuk Bahasa Indonesia + coding + web dev.
 
-          ### Apa yang baru
-          - Base: Qwen/Qwen2.5-3B-Instruct
-          - LoRA: r=32, alpha=64
-          - Dataset: $(wc -l < data/train.jsonl) percakapan Bahasa Indonesia
-          - Quantization: Q4_K_M (~2GB, optimal untuk mobile)
+### Spesifikasi
+- Base: \`$BASE_MODEL\`
+- Fine-tune: LoRA r=16, alpha=32
+- Dataset: $DATASET_SIZE percakapan Bahasa Indonesia
+- Quantization: Q4_K_M
+- Training: 2 epochs, max_len=768
 
-          ### Cara Pakai
-          1. Download file \`aurum-brain-q4_k_m.gguf\`
-          2. Buka **PocketPal** app di HP
-          3. Import file GGUF (lihat docs/POCKETPAL.md untuk detail)
-          4. Set system prompt dari \`system_prompt.txt\`
-          5. Mulai chat dalam Bahasa Indonesia!
+### Cara Pakai
 
-          ### Alternatif
-          - **Ollama**: \`ollama create aurum-brain -f modelfile\`
-          - **LM Studio**: Import GGUF, set system prompt
-          - **llama.cpp**: \`./main -m aurum-brain-q4_k_m.gguf\`
+**PocketPal (HP)**: Download GGUF → Import → set system prompt dari \`system_prompt.txt\`
 
-          Commit: ${GITHUB_SHA::7}
-          EOF
-          )"
+**Ollama**:
+\`\`\`bash
+ollama create aurum-brain -f modelfile
+ollama run aurum-brain
+\`\`\`
+
+**llama.cpp**:
+\`\`\`bash
+./main -m aurum-brain-q4_k_m.gguf -p 'Halo, siapa kamu?'
+\`\`\`
+
+Commit: ${GITHUB_SHA::7}
+"
