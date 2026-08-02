@@ -111,8 +111,18 @@ jobs:
           name: aurum-brain-gguf
           path: |
             out/aurum-brain-q4_k_m.gguf
+            out/merged/
             data/system_prompt.txt
           retention-days: 90
+
+      - name: Upload to Hugging Face Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_REPO_ID: arissuga/aurum-brain-ai
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          pip install -q huggingface_hub
+          python scripts/upload_to_hf.py
 
       - name: Create GitHub Release
         env:
