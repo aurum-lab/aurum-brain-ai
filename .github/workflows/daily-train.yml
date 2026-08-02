@@ -2,8 +2,10 @@ name: Daily Train - AI belajar tiap hari
 
 on:
   schedule:
-    # Setiap hari jam 03:00 UTC = 10:00 WIB
-    - cron: "0 3 * * *"
+    # Setiap 3 jam = 8x sehari (optimal untuk free tier)
+    # 00:00, 03:00, 06:00, 09:00, 12:00, 15:00, 18:00, 21:00 UTC
+    # = 07:00, 10:00, 13:00, 16:00, 19:00, 22:00, 01:00, 04:00 WIB
+    - cron: "0 */3 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -42,7 +44,24 @@ jobs:
 
       - name: Expand dataset (tambah percakapan baru)
         run: |
-          python scripts/expand_dataset.py
+          # Cek ukuran dataset dulu, skip expand kalau sudah >200 conversations
+          CURRENT_SIZE=$(python3 -c "
+          import json
+          with open('data/conversations_source.json') as f:
+            print(len(json.load(f)))
+          " 2>/dev/null || echo 0)
+          
+          echo "Current dataset size: $CURRENT_SIZE conversations"
+          
+          if [ "$CURRENT_SIZE" -lt 200 ]; then
+            echo "Dataset <200, expand with new conversations..."
+            python scripts/expand_dataset.py
+            python scripts/expand_agent_dataset.py || true
+          else
+            echo "Dataset >=200, skip expand (cap reached untuk hemat training time)"
+            echo "Kalau mau expand lebih, hapus beberapa percakapan lama dulu"
+          fi
+          
           echo "Dataset setelah expand: $(wc -l < data/train.jsonl) lines (target)"
 
       - name: Build dataset (JSONL format)
@@ -98,14 +117,14 @@ jobs:
             data/expansion_log.json
           retention-days: 30
 
-      - name: Cleanup old releases (keep 7 terakhir)
+      - name: Cleanup old releases (keep 14 terakhir = ~2 hari)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "=== Cleanup old releases (keep 7 latest) ==="
-          # List semua releases, sort by date, delete yang lama
+          echo "=== Cleanup old releases (keep 14 latest) ==="
+          # 8x/hari × 2 hari = 16 releases, keep 14 untuk safety
           gh release list --repo "$GITHUB_REPOSITORY" --limit 100 | \
-            awk 'NR > 7 {print $1}' | \
+            awk 'NR > 14 {print $1}' | \
             while read -r tag; do
               if [ -n "$tag" ]; then
                 echo "Deleting old release: $tag"
@@ -113,17 +132,17 @@ jobs:
               fi
             done
           echo "Cleanup done. Remaining releases:"
-          gh release list --repo "$GITHUB_REPOSITORY" --limit 10
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 5
 
       - name: Create daily release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Versi: daily-YYYY.MM.DD
-          VER="daily-$(date +%Y.%m.%d)"
+          # Versi: daily-YYYY.MM.DD-HH (unique per run, 8x/hari)
+          VER="daily-$(date +%Y.%m.%d-%H)"
           DATASET_SIZE=$(wc -l < data/train.jsonl)
           
-          # Cek apakah release hari ini sudah ada
+          # Cek apakah release jam ini sudah ada
           if gh release view "$VER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $VER sudah ada, delete dulu..."
             gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
@@ -131,9 +150,9 @@ jobs:
           
           # Bikin release notes
           cat > /tmp/release_notes.md << RELEASEEOF
-          ## Aurum Brain AI - Daily Build $VER
+          ## Aurum Brain AI - Build $VER
 
-          AI model auto-trained hari ini. Makin pintar tiap hari! 🧠
+          AI model auto-trained. Makin pintar tiap 3 jam! 🧠
 
           ### Spesifikasi
           - Base: Qwen/Qwen2.5-1.5B-Instruct
@@ -159,7 +178,7 @@ jobs:
             data/system_prompt.txt \
             data/expansion_log.json \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Aurum Brain AI $VER (Daily)" \
+            --title "Aurum Brain AI $VER" \
             --notes-file /tmp/release_notes.md \
             --latest
 
