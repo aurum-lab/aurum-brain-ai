@@ -122,36 +122,40 @@ jobs:
           DATASET_SIZE=$(wc -l < data/train.jsonl)
           BASE_MODEL="${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-1.5B-Instruct' }}"
           
+          # Bikin release notes file (hindari YAML multi-line issues)
+          cat > /tmp/release_notes.md << RELEASEEOF
+          ## Aurum Brain AI - Custom Fine-Tuned Model
+
+          Model AI buatan sendiri, fine-tuned untuk Bahasa Indonesia + coding + web dev.
+
+          ### Spesifikasi
+          - Base: \`$BASE_MODEL\`
+          - Fine-tune: LoRA r=16, alpha=32
+          - Dataset: $DATASET_SIZE percakapan Bahasa Indonesia
+          - Quantization: Q4_K_M
+          - Training: 2 epochs, max_len=768
+
+          ### Cara Pakai
+
+          **PocketPal (HP)**: Download GGUF → Import → set system prompt dari \`system_prompt.txt\`
+
+          **Ollama**:
+          \`\`\`bash
+          ollama create aurum-brain -f modelfile
+          ollama run aurum-brain
+          \`\`\`
+
+          **llama.cpp**:
+          \`\`\`bash
+          ./main -m aurum-brain-q4_k_m.gguf -p 'Halo, siapa kamu?'
+          \`\`\`
+
+          Commit: ${GITHUB_SHA::7}
+          RELEASEEOF
+          
           gh release create "$VER" \
             out/aurum-brain-q4_k_m.gguf \
             data/system_prompt.txt \
             --repo "$GITHUB_REPOSITORY" \
             --title "Aurum Brain AI $VER" \
-            --notes "## Aurum Brain AI - Custom Fine-Tuned Model
-
-Model AI buatan sendiri, fine-tuned untuk Bahasa Indonesia + coding + web dev.
-
-### Spesifikasi
-- Base: \`$BASE_MODEL\`
-- Fine-tune: LoRA r=16, alpha=32
-- Dataset: $DATASET_SIZE percakapan Bahasa Indonesia
-- Quantization: Q4_K_M
-- Training: 2 epochs, max_len=768
-
-### Cara Pakai
-
-**PocketPal (HP)**: Download GGUF → Import → set system prompt dari \`system_prompt.txt\`
-
-**Ollama**:
-\`\`\`bash
-ollama create aurum-brain -f modelfile
-ollama run aurum-brain
-\`\`\`
-
-**llama.cpp**:
-\`\`\`bash
-./main -m aurum-brain-q4_k_m.gguf -p 'Halo, siapa kamu?'
-\`\`\`
-
-Commit: ${GITHUB_SHA::7}
-"
+            --notes-file /tmp/release_notes.md
