@@ -201,22 +201,52 @@ jobs:
               \"download_url\": \"${DOWNLOAD_URL}\"
             }" || echo "Telegram notify failed (OK, tidak block workflow)"
 
-      - name: Commit dataset expansion
-        continue-on-error: true  # Tidak block workflow kalau push gagal
+      - name: Save expansion log via GitHub API
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "Aurum AI Bot"
-          git config user.email "actions@github.com"
-          git add data/conversations_source.json data/expansion_log.json data/train.jsonl
-          if git diff --cached --quiet; then
-            echo "No dataset changes to commit"
-          else
-            git commit -m "chore(daily): expand dataset + train $(date +%Y-%m-%d)"
-
-          - Added new conversation variations
-          - Auto-trained model
-          - Release: daily-$(date +%Y.%m.%d)"
-            
-            # Pull rebase untuk hindari conflict (repo mungkin sudah ada commit baru)
-            git pull --rebase origin main || true
-            git push || echo "Push failed (OK, dataset sudah di-train)"
+          # Pakai GitHub API untuk commit expansion_log.json (tidak akan conflict)
+          if [ ! -f data/expansion_log.json ]; then
+            echo "No expansion_log.json, skip"
+            exit 0
           fi
+          
+          CONTENT=$(base64 -w 0 data/expansion_log.json)
+          
+          # Get current file SHA
+          FILE_SHA=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/data/expansion_log.json" \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
+          
+          # Commit via API
+          python3 -c "
+import json, os, urllib.request
+content = os.environ.get('CONTENT', '')
+sha = os.environ.get('FILE_SHA', '')
+data = {
+    'message': 'chore: update expansion log [skip ci]',
+    'content': content,
+    'branch': 'main'
+}
+if sha:
+    data['sha'] = sha
+req = urllib.request.Request(
+    'https://api.github.com/repos/' + os.environ.get('GITHUB_REPOSITORY', '') + '/contents/data/expansion_log.json',
+    data=json.dumps(data).encode(),
+    method='PUT',
+    headers={
+        'Authorization': 'token ' + os.environ.get('GH_TOKEN', ''),
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+    }
+)
+try:
+    resp = json.loads(urllib.request.urlopen(req).read())
+    if resp.get('commit'):
+        print(f'OK Committed: {resp["commit"]["sha"][:7]}')
+    else:
+        print(f'Skip: {resp.get("message", "unknown")}')
+except Exception as e:
+    print(f'Commit failed (OK): {e}')
+" || echo "Commit step done"
