@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       base_model:
-        description: 'Base model (default: Qwen2.5-1.5B-Instruct, lebih cepat)'
+        description: 'Base model (default: Qwen2.5-3B-Instruct, 2x lebih pintar dari 1.5B)'
         required: false
-        default: 'Qwen/Qwen2.5-1.5B-Instruct'
+        default: 'Qwen/Qwen2.5-3B-Instruct'
       epochs:
         description: 'Training epochs (default: 2)'
         required: false
@@ -65,9 +65,9 @@ jobs:
 
       - name: Train model (LoRA fine-tuning)
         env:
-          # Default ke model 1.5B supaya cepat (15-30 menit)
+          # Default ke model 3B (2x lebih pintar, 30-50 menit)
           # Bisa override via workflow_dispatch input
-          AURUM_BASE_MODEL: ${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-1.5B-Instruct' }}
+          AURUM_BASE_MODEL: ${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-3B-Instruct' }}
           EPOCHS: ${{ github.event.inputs.epochs || '2' }}
           BATCH_SIZE: '1'
           GRAD_ACCUM: '4'
@@ -130,7 +130,7 @@ jobs:
         run: |
           VER="v$(date +%Y.%m.%d)-${GITHUB_SHA::7}"
           DATASET_SIZE=$(wc -l < data/train.jsonl)
-          BASE_MODEL="${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-1.5B-Instruct' }}"
+          BASE_MODEL="${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-3B-Instruct' }}"
           
           # Bikin release notes file (hindari YAML multi-line issues)
           cat > /tmp/release_notes.md << RELEASEEOF

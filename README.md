@@ -1,6 +1,6 @@
 # 🧠 Aurum Brain AI
 
-> AI buatan sendiri — fine-tuned dari Qwen2.5-1.5B-Instruct untuk **Bahasa Indonesia**, **coding expert**, dan **percakapan pintar**.
+> AI buatan sendiri — fine-tuned dari Qwen2.5-3B-Instruct untuk **Bahasa Indonesia**, **coding expert**, dan **percakapan pintar**.
 > 
 > Output format: GGUF (siap import ke **PocketPal**, **Ollama**, **LM Studio**, **llama.cpp**).
 > 
@@ -8,7 +8,7 @@
 
 ![Model](https://img.shields.io/badge/Model-Qwen2.5--1.5B-blue)
 ![Format](https://img.shields.io/badge/Format-GGUF_Q4__K__M-green)
-![Size](https://img.shields.io/badge/Size-~940MB-orange)
+![Size](https://img.shields.io/badge/Size-~2GB-orange)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Daily Training](https://img.shields.io/badge/Auto_Train-8x/day-purple)
 
@@ -20,7 +20,7 @@
 
 ## 🎯 Apa Ini?
 
-**Aurum Brain AI** adalah model AI custom yang di-fine-tune dari Qwen2.5-1.5B-Instruct dengan dataset Bahasa Indonesia berkualitas. Dirancang untuk:
+**Aurum Brain AI** adalah model AI custom yang di-fine-tune dari Qwen2.5-3B-Instruct dengan dataset Bahasa Indonesia berkualitas. Dirancang untuk:
 
 - 🇮🇩 **Bahasa Indonesia natural** — bukan terjemahan, tapi native
 - 💻 **Coding expert** — Python, JS/TS, Rust, Go, SQL, dan 25+ bahasa lainnya
@@ -86,7 +86,7 @@ aurum-brain-ai/
 │   └── train.py                       # LoRA fine-tuning script
 ├── .github/workflows/
 │   ├── train.yml                      # Auto-train + release GGUF
-│   └── starter-release.yml            # Starter model (Qwen2.5-1.5B) cepat
+│   └── starter-release.yml            # Starter model (Qwen2.5-3B) cepat
 ├── docs/
 │   ├── POCKETPAL.md                   # Import ke PocketPal (HP)
 │   ├── OLLAMA.md                      # Pakai dengan Ollama

@@ -79,7 +79,7 @@ jobs:
 
       - name: Train model (LoRA fine-tuning)
         env:
-          AURUM_BASE_MODEL: 'Qwen/Qwen2.5-1.5B-Instruct'
+          AURUM_BASE_MODEL: 'Qwen/Qwen2.5-3B-Instruct'
           EPOCHS: '2'
           BATCH_SIZE: '1'
           GRAD_ACCUM: '4'
@@ -164,7 +164,7 @@ jobs:
           AI model auto-trained. Makin pintar tiap 3 jam! 🧠
 
           ### Spesifikasi
-          - Base: Qwen/Qwen2.5-1.5B-Instruct
+          - Base: Qwen/Qwen2.5-3B-Instruct
           - Fine-tune: LoRA r=16, alpha=32
           - Dataset: $DATASET_SIZE percakapan Bahasa Indonesia
           - Quantization: Q4_K_M (~1GB)
@@ -206,7 +206,7 @@ jobs:
               \"event\": \"training_complete\",
               \"release_tag\": \"${RELEASE_TAG}\",
               \"dataset_size\": \"${DATASET_SIZE}\",
-              \"model_info\": \"Qwen2.5-1.5B Q4_K_M\",
+              \"model_info\": \"Qwen2.5-3B Q4_K_M\",
               \"download_url\": \"${DOWNLOAD_URL}\"
             }" || echo "Telegram notify failed (OK, tidak block workflow)"
 

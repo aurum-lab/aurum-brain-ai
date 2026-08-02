@@ -26,8 +26,8 @@ os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 # Konfigurasi - bisa di-override via environment variable
-# Default ke 1.5B (lebih cepat, ~15-30 menit) — bisa override ke 3B via env
-BASE_MODEL = os.environ.get("AURUM_BASE_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")
+# Default ke 3B (2x lebih pintar dari 1.5B, masih bisa jalan di HP RAM 4GB)
+BASE_MODEL = os.environ.get("AURUM_BASE_MODEL", "Qwen/Qwen2.5-3B-Instruct")
 DATA_PATH = Path(__file__).parent.parent / "data" / "train.jsonl"
 OUT_DIR = Path(__file__).parent.parent / "out"
 ADAPTER_DIR = OUT_DIR / "adapter"
