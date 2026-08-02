@@ -4,7 +4,17 @@
       "date": "2026-08-02T02:51:41.899009",
       "added": 17,
       "total": 56
+    },
+    {
+      "date": "2026-08-02T04:50:44.094856",
+      "added": 12,
+      "total": 68,
+      "categories": [
+        "agent_ai",
+        "multi_domain",
+        "scenarios"
+      ]
     }
   ],
-  "total_added": 17
+  "total_added": 29
 }
