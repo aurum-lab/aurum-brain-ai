@@ -44,7 +44,6 @@ jobs:
 
       - name: Expand dataset (tambah percakapan baru)
         run: |
-          # Cek ukuran dataset dulu, skip expand kalau sudah >200 conversations
           CURRENT_SIZE=$(python3 -c "
           import json
           with open('data/conversations_source.json') as f:
@@ -59,8 +58,13 @@ jobs:
             python scripts/expand_agent_dataset.py || true
           else
             echo "Dataset >=200, skip expand (cap reached untuk hemat training time)"
-            echo "Kalau mau expand lebih, hapus beberapa percakapan lama dulu"
           fi
+
+      - name: Distillation (belajar dari professor 70B)
+        run: |
+          echo "=== Distillation: Professor 70B → Murid 3B ==="
+          echo "Generate jawaban berkualitas tinggi dari Llama 70B..."
+          python scripts/distill_dataset.py || echo "Distillation partially failed (OK, lanjut training)"
           
           echo "Dataset setelah expand: $(wc -l < data/train.jsonl) lines (target)"
 
