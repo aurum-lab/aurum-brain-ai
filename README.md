@@ -158,10 +158,10 @@ Tambah data Anda sendiri di **`scripts/generate_source.js`**.
 
 ## 🔄 Auto-Update
 
+### Manual Training (on push)
 Setiap kali ada perubahan di `data/` atau `scripts/`, GitHub Actions akan:
-
 1. Build dataset baru
-2. Train model dari awal (LoRA fine-tuning, ~30 menit)
+2. Train model dari awal (LoRA fine-tuning, ~25 menit)
 3. Convert ke GGUF Q4_K_M
 4. Upload sebagai artifact
 5. Create GitHub Release baru dengan GGUF siap download
@@ -169,6 +169,31 @@ Setiap kali ada perubahan di `data/` atau `scripts/`, GitHub Actions akan:
 Manual trigger:
 ```bash
 gh workflow run train.yml -R aurum-lab/aurum-brain-ai
+```
+
+### 🆕 Daily Auto-Training (mirip NVIDIA)
+AI **belajar tiap hari** otomatis:
+- ⏰ Setiap hari jam **10:00 WIB** (03:00 UTC)
+- 📚 Dataset di-expand dengan variasi baru (paraphrasing, contoh kode baru)
+- 🧠 Training LoRA fine-tuning ulang
+- 📦 Release baru otomatis di GitHub Releases
+- 🗑️ Auto-cleanup release lama (keep 7 terbaru)
+- 📊 Progress tracking di `data/expansion_log.json`
+
+**Mirip NVIDIA yang terus improve model mereka** — semakin lama, AI makin pintar karena dataset makin besar + variatif.
+
+Track progress:
+```bash
+# Lihat history ekspansi dataset
+curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/expansion_log.json | python3 -m json.tool
+
+# Lihat semua versi daily
+gh release list -R aurum-lab/aurum-brain-ai --limit 10
+```
+
+Manual trigger daily training:
+```bash
+gh workflow run daily-train.yml -R aurum-lab/aurum-brain-ai
 ```
 
 ## 🆚 Perbandingan dengan AI Lain

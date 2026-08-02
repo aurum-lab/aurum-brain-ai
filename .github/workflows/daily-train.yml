@@ -1,0 +1,180 @@
+name: Daily Train - AI belajar tiap hari
+
+on:
+  schedule:
+    # Setiap hari jam 03:00 UTC = 10:00 WIB
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force training (skip dataset expansion check)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  daily-train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers peft datasets accelerate sentencepiece protobuf
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential cmake git
+
+      - name: Expand dataset (tambah percakapan baru)
+        run: |
+          python scripts/expand_dataset.py
+          echo "Dataset setelah expand: $(wc -l < data/train.jsonl) lines (target)"
+
+      - name: Build dataset (JSONL format)
+        run: |
+          python scripts/build_dataset.py
+          echo "Final dataset: $(wc -l < data/train.jsonl) lines"
+
+      - name: Build llama.cpp
+        run: |
+          git clone --depth 1 https://github.com/ggerganov/llama.cpp
+          cd llama.cpp
+          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+          cmake --build build --config Release -j 2 --target llama-quantize
+          ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
+
+      - name: Train model (LoRA fine-tuning)
+        env:
+          AURUM_BASE_MODEL: 'Qwen/Qwen2.5-1.5B-Instruct'
+          EPOCHS: '2'
+          BATCH_SIZE: '1'
+          GRAD_ACCUM: '4'
+          MAX_LEN: '768'
+          LORA_R: '16'
+          LORA_ALPHA: '32'
+        run: |
+          echo "=== Daily Training - $(date) ==="
+          python scripts/train.py
+
+      - name: Verify GGUF output
+        run: |
+          ls -la out/
+          if [ ! -f out/aurum-brain-q4_k_m.gguf ]; then
+            echo "ERROR: GGUF file tidak ditemukan!"
+            exit 1
+          fi
+          echo "GGUF size: $(du -h out/aurum-brain-q4_k_m.gguf)"
+          python3 -c "
+          import struct
+          with open('out/aurum-brain-q4_k_m.gguf', 'rb') as f:
+            magic = f.read(4)
+            assert magic == b'GGUF', 'Invalid GGUF'
+            version = struct.unpack('<I', f.read(4))[0]
+            print(f'GGUF v{version} valid')
+          "
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurum-brain-daily-${{ github.run_id }}
+          path: |
+            out/aurum-brain-q4_k_m.gguf
+            data/system_prompt.txt
+            data/expansion_log.json
+          retention-days: 30
+
+      - name: Cleanup old releases (keep 7 terakhir)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== Cleanup old releases (keep 7 latest) ==="
+          # List semua releases, sort by date, delete yang lama
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 100 | \
+            awk 'NR > 7 {print $1}' | \
+            while read -r tag; do
+              if [ -n "$tag" ]; then
+                echo "Deleting old release: $tag"
+                gh release delete "$tag" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
+              fi
+            done
+          echo "Cleanup done. Remaining releases:"
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 10
+
+      - name: Create daily release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Versi: daily-YYYY.MM.DD
+          VER="daily-$(date +%Y.%m.%d)"
+          DATASET_SIZE=$(wc -l < data/train.jsonl)
+          
+          # Cek apakah release hari ini sudah ada
+          if gh release view "$VER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $VER sudah ada, delete dulu..."
+            gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
+          fi
+          
+          # Bikin release notes
+          cat > /tmp/release_notes.md << RELEASEEOF
+          ## Aurum Brain AI - Daily Build $VER
+
+          AI model auto-trained hari ini. Makin pintar tiap hari! 🧠
+
+          ### Spesifikasi
+          - Base: Qwen/Qwen2.5-1.5B-Instruct
+          - Fine-tune: LoRA r=16, alpha=32
+          - Dataset: $DATASET_SIZE percakapan Bahasa Indonesia
+          - Quantization: Q4_K_M (~1GB)
+          - Training: 2 epochs, max_len=768
+
+          ### Cara Pakai
+          1. Download GGUF
+          2. Import ke PocketPal / Ollama / llama.cpp
+          3. Set system prompt dari system_prompt.txt
+          4. Mulai chat!
+
+          ### Tracking Progress
+          Lihat expansion_log.json untuk history perkembangan dataset.
+
+          Auto-trained: $(date -u)
+          RELEASEEOF
+          
+          gh release create "$VER" \
+            out/aurum-brain-q4_k_m.gguf \
+            data/system_prompt.txt \
+            data/expansion_log.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Aurum Brain AI $VER (Daily)" \
+            --notes-file /tmp/release_notes.md \
+            --latest
+
+      - name: Commit dataset expansion
+        run: |
+          git config user.name "Aurum AI Bot"
+          git config user.email "actions@github.com"
+          git add data/conversations_source.json data/expansion_log.json data/train.jsonl
+          if git diff --cached --quiet; then
+            echo "No dataset changes to commit"
+          else
+            git commit -m "chore(daily): expand dataset + train $(date +%Y-%m-%d)
+
+          - Added new conversation variations
+          - Auto-trained model
+          - Release: daily-$(date +%Y.%m.%d)"
+            git push
+          fi
