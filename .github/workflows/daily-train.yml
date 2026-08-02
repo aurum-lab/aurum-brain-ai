@@ -206,7 +206,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Pakai GitHub API untuk commit expansion_log.json (tidak akan conflict)
           if [ ! -f data/expansion_log.json ]; then
             echo "No expansion_log.json, skip"
             exit 0
@@ -214,39 +213,19 @@ jobs:
           
           CONTENT=$(base64 -w 0 data/expansion_log.json)
           
-          # Get current file SHA
           FILE_SHA=$(curl -s -H "Authorization: token $GH_TOKEN" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/data/expansion_log.json" \
             | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
           
-          # Commit via API
-          python3 -c "
-import json, os, urllib.request
-content = os.environ.get('CONTENT', '')
-sha = os.environ.get('FILE_SHA', '')
-data = {
-    'message': 'chore: update expansion log [skip ci]',
-    'content': content,
-    'branch': 'main'
-}
-if sha:
-    data['sha'] = sha
-req = urllib.request.Request(
-    'https://api.github.com/repos/' + os.environ.get('GITHUB_REPOSITORY', '') + '/contents/data/expansion_log.json',
-    data=json.dumps(data).encode(),
-    method='PUT',
-    headers={
-        'Authorization': 'token ' + os.environ.get('GH_TOKEN', ''),
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-    }
-)
-try:
-    resp = json.loads(urllib.request.urlopen(req).read())
-    if resp.get('commit'):
-        print(f'OK Committed: {resp["commit"]["sha"][:7]}')
-    else:
-        print(f'Skip: {resp.get("message", "unknown")}')
-except Exception as e:
-    print(f'Commit failed (OK): {e}')
-" || echo "Commit step done"
+          SHA_JSON=""
+          if [ -n "$FILE_SHA" ]; then
+            SHA_JSON=",\"sha\":\"$FILE_SHA\""
+          fi
+          
+          curl -s -X PUT \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/data/expansion_log.json" \
+            -d "{\"message\":\"chore: update expansion log [skip ci]\",\"content\":\"$CONTENT\",\"branch\":\"main\"$SHA_JSON}" \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'OK: {d[\"commit\"][\"sha\"][:7]}') if d.get('commit') else print(f'Skip: {d.get(\"message\",\"?\")}')" \
+            || echo "Commit failed (OK, tidak block workflow)"
