@@ -1,15 +1,26 @@
 # 🧠 Aurum Brain AI
 
-> AI buatan sendiri — fine-tuned dari Qwen2.5-3B-Instruct untuk **Bahasa Indonesia**, **coding expert**, dan **percakapan pintar**.
+> AI buatan sendiri — fine-tuned dari Qwen2.5-1.5B-Instruct untuk **Bahasa Indonesia**, **coding expert**, dan **percakapan pintar**.
 > 
 > Output format: GGUF (siap import ke **PocketPal**, **Ollama**, **LM Studio**, **llama.cpp**).
+> 
+> 🤖 **Telegram Bot**: [@Tessstyx_bot](https://t.me/Tessstyx_bot) — chat langsung dengan AI + monitoring training
 
-[![Train & Release](https://github.com/aurum-lab/aurum-brain-ai/actions/workflows/train.yml/badge.svg)](https://github.com/aurum-lab/aurum-brain-ai/actions/workflows/train.yml)
-[![Download GGUF](https://img.shields.io/badge/Download-GGUF-2GB-yellow.svg)](https://github.com/aurum-lab/aurum-brain-ai/releases)
+![Model](https://img.shields.io/badge/Model-Qwen2.5--1.5B-blue)
+![Format](https://img.shields.io/badge/Format-GGUF_Q4__K__M-green)
+![Size](https://img.shields.io/badge/Size-~940MB-orange)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Daily Training](https://img.shields.io/badge/Auto_Train-8x/day-purple)
+
+**Links:**
+- 📦 [Download GGUF](https://github.com/aurum-lab/aurum-brain-ai/releases)
+- 🤖 [Telegram Bot](https://t.me/Tessstyx_bot)
+- ☁️ [Cloudflare AI Server](https://aurum-brain-server.cakagus.workers.dev/health)
+- 📊 [Training Status](https://github.com/aurum-lab/aurum-brain-ai/actions)
 
 ## 🎯 Apa Ini?
 
-**Aurum Brain AI** adalah model AI custom yang di-fine-tune dari Qwen2.5-3B-Instruct dengan dataset Bahasa Indonesia berkualitas. Dirancang untuk:
+**Aurum Brain AI** adalah model AI custom yang di-fine-tune dari Qwen2.5-1.5B-Instruct dengan dataset Bahasa Indonesia berkualitas. Dirancang untuk:
 
 - 🇮🇩 **Bahasa Indonesia natural** — bukan terjemahan, tapi native
 - 💻 **Coding expert** — Python, JS/TS, Rust, Go, SQL, dan 25+ bahasa lainnya
