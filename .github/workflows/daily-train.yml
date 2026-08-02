@@ -117,6 +117,15 @@ jobs:
             data/expansion_log.json
           retention-days: 30
 
+      - name: Upload to Hugging Face Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_REPO_ID: arissuga/aurum-brain-ai
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          pip install -q huggingface_hub
+          python scripts/upload_to_hf.py
+
       - name: Cleanup old releases (keep 14 terakhir = ~2 hari)
         env:
           GH_TOKEN: ${{ github.token }}
