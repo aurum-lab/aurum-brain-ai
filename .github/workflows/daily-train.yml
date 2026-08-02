@@ -202,6 +202,7 @@ jobs:
             }" || echo "Telegram notify failed (OK, tidak block workflow)"
 
       - name: Commit dataset expansion
+        continue-on-error: true  # Tidak block workflow kalau push gagal
         run: |
           git config user.name "Aurum AI Bot"
           git config user.email "actions@github.com"
@@ -209,10 +210,13 @@ jobs:
           if git diff --cached --quiet; then
             echo "No dataset changes to commit"
           else
-            git commit -m "chore(daily): expand dataset + train $(date +%Y-%m-%d)
+            git commit -m "chore(daily): expand dataset + train $(date +%Y-%m-%d)"
 
           - Added new conversation variations
           - Auto-trained model
           - Release: daily-$(date +%Y.%m.%d)"
-            git push
+            
+            # Pull rebase untuk hindari conflict (repo mungkin sudah ada commit baru)
+            git pull --rebase origin main || true
+            git push || echo "Push failed (OK, dataset sudah di-train)"
           fi
