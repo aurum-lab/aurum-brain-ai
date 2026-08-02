@@ -181,6 +181,25 @@ jobs:
             --title "Aurum Brain AI $VER" \
             --notes-file /tmp/release_notes.md \
             --latest
+          
+          # Save release info untuk Telegram notification
+          echo "RELEASE_TAG=$VER" >> $GITHUB_ENV
+          echo "DATASET_SIZE=$DATASET_SIZE" >> $GITHUB_ENV
+          echo "DOWNLOAD_URL=https://github.com/$GITHUB_REPOSITORY/releases/download/$VER/aurum-brain-q4_k_m.gguf" >> $GITHUB_ENV
+
+      - name: Notify Telegram (training complete)
+        if: success()
+        run: |
+          # Kirim notif ke Telegram bot worker
+          curl -s -X POST "https://aurum-telegram-bot.cakagus.workers.dev/webhook" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"event\": \"training_complete\",
+              \"release_tag\": \"${RELEASE_TAG}\",
+              \"dataset_size\": \"${DATASET_SIZE}\",
+              \"model_info\": \"Qwen2.5-1.5B Q4_K_M\",
+              \"download_url\": \"${DOWNLOAD_URL}\"
+            }" || echo "Telegram notify failed (OK, tidak block workflow)"
 
       - name: Commit dataset expansion
         run: |
