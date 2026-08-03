@@ -17,6 +17,10 @@ permissions:
   contents: write
   actions: write
 
+concurrency:
+  group: "daily-train"
+  cancel-in-progress: true
+
 jobs:
   daily-train:
     runs-on: ubuntu-latest
@@ -78,8 +82,12 @@ jobs:
           git clone --depth 1 https://github.com/ggerganov/llama.cpp
           cd llama.cpp
           cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
-          cmake --build build --config Release -j 2 --target llama-quantize
+          cmake --build build --config Release -j 1 --target llama-quantize
           ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
+          if [ ! -f build/bin/llama-quantize ]; then
+            cmake --build build --config Release -j 1 --target quantize || true
+            ln -sf quantize build/bin/llama-quantize 2>/dev/null || true
+          fi
 
       - name: Train model (LoRA fine-tuning)
         env:

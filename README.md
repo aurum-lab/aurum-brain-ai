@@ -40,25 +40,19 @@ File yang dibutuhkan:
 
 ## 📱 Cara Pakai
 
-### Termux (HP Android) — AI lokal dengan custom provider
-Installer & tools Termux sudah dipindah ke repo terpisah:
+### Cloudflare Worker (Remote Server — Paling Gampang)
+AI server gratis via Cloudflare. Pakai Llama 3.3 70B, tidak perlu install apapun.
 
-👉 **https://github.com/aurum-lab/aurum-termux**
+| Field | Value |
+|-------|-------|
+| **Base URL** | `https://aurum-brain-server.cakagus.workers.dev/v1` |
+| **API Key** | `sk-aurum-brain-aeb07f01e56285f4c58cadcdc67afbc8` |
+| **Model** | `aurum-brain` |
 
-Quick install:
-```bash
-# Di Termux (install dari F-Droid, bukan Play Store)
-curl -sL https://raw.githubusercontent.com/aurum-lab/aurum-termux/main/install.sh | bash
-```
+### Telegram Bot
+Chat langsung dengan AI di Telegram: **@Tessstyx_bot**
 
-Setelah install, AI jalan sebagai **server lokal** di `http://localhost:8080` dengan API OpenAI-compatible. Bisa dipakai sebagai:
-- **Custom provider di OpenClaw** — chat di app Android
-- **Open WebUI** — UI web seperti ChatGPT
-- **Cherry Studio** — desktop client (Windows/Mac/Linux)
-- **VSCode Continue** — AI coding assistant di editor
-- **App lain** yang support OpenAI API
-
-### PocketPal (HP — paling gampang)
+### PocketPal (HP — Offline)
 Lihat **[docs/POCKETPAL.md](docs/POCKETPAL.md)** untuk panduan lengkap.
 
 ### Ollama (Mac/Linux/Windows)
@@ -96,8 +90,7 @@ aurum-brain-ai/
 └── README.md
 ```
 
-**Note:** Untuk install di Termux (HP Android), lihat repo terpisah:
-**[aurum-lab/aurum-termux](https://github.com/aurum-lab/aurum-termux)**
+**Note:** Untuk chat online, pakai Cloudflare Worker atau Telegram bot. Lihat section "Cara Pakai" di atas.
 
 ## 🧬 Spesifikasi Model
 
