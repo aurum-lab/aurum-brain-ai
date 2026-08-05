@@ -1,11 +1,11 @@
-name: Daily Train - AI belajar tiap hari
+name: Daily Train - AI belajar tiap hari (Optimized)
 
 on:
   schedule:
-    # Setiap 3 jam = 8x sehari (optimal untuk free tier)
-    # 00:00, 03:00, 06:00, 09:00, 12:00, 15:00, 18:00, 21:00 UTC
-    # = 07:00, 10:00, 13:00, 16:00, 19:00, 22:00, 01:00, 04:00 WIB
-    - cron: "0 */3 * * *"
+    # Setiap 6 jam = 4x sehari (aman untuk free tier 6 jam limit)
+    # 00:00, 06:00, 12:00, 18:00 UTC
+    # = 07:00, 13:00, 19:00, 01:00 WIB
+    - cron: "0 */6 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -24,7 +24,7 @@ concurrency:
 jobs:
   daily-train:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 300  # 5 jam max (buffer 1 jam dari 6 jam limit)
     steps:
       - uses: actions/checkout@v4
 
@@ -38,15 +38,36 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
           df -h
 
-      - name: Install dependencies
+      # === CACHE llama.cpp build (save 15-20 min per run) ===
+      - name: Cache llama.cpp
+        id: llama-cache
+        uses: actions/cache@v4
+        with:
+          path: llama.cpp/build
+          key: llama-cpp-${{ runner.os }}-${{ hashFiles('scripts/train.py') }}
+          restore-keys: |
+            llama-cpp-${{ runner.os }}-
+
+      - name: Install Python dependencies
         run: |
           pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install transformers peft datasets accelerate sentencepiece protobuf
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq build-essential cmake git
 
-      - name: Expand dataset (tambah percakapan baru)
+      - name: Build llama.cpp (only if cache miss)
+        if: steps.llama-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 https://github.com/ggerganov/llama.cpp
+          cd llama.cpp
+          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+          cmake --build build --config Release -j 2 --target llama-quantize
+          ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
+          if [ ! -f build/bin/llama-quantize ]; then
+            cmake --build build --config Release -j 2 --target quantize || true
+            ln -sf quantize build/bin/llama-quantize 2>/dev/null || true
+          fi
+
+      - name: Expand dataset (hanya kalau < 150 convos)
         run: |
           CURRENT_SIZE=$(python3 -c "
           import json
@@ -56,46 +77,26 @@ jobs:
           
           echo "Current dataset size: $CURRENT_SIZE conversations"
           
-          if [ "$CURRENT_SIZE" -lt 200 ]; then
-            echo "Dataset <200, expand with new conversations..."
+          if [ "$CURRENT_SIZE" -lt 150 ]; then
+            echo "Dataset <150, expand..."
             python scripts/expand_dataset.py
             python scripts/expand_agent_dataset.py || true
           else
-            echo "Dataset >=200, skip expand (cap reached untuk hemat training time)"
+            echo "Dataset >=150, skip expand (cap reached)"
           fi
 
-      - name: Distillation (belajar dari professor 70B)
-        run: |
-          echo "=== Distillation: Professor 70B → Murid 3B ==="
-          echo "Generate jawaban berkualitas tinggi dari Llama 70B..."
-          python scripts/distill_dataset.py || echo "Distillation partially failed (OK, lanjut training)"
-          
-          echo "Dataset setelah expand: $(wc -l < data/train.jsonl) lines (target)"
-
-      - name: Build dataset (JSONL format)
+      - name: Build dataset (JSONL)
         run: |
           python scripts/build_dataset.py
           echo "Final dataset: $(wc -l < data/train.jsonl) lines"
 
-      - name: Build llama.cpp
-        run: |
-          git clone --depth 1 https://github.com/ggerganov/llama.cpp
-          cd llama.cpp
-          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
-          cmake --build build --config Release -j 1 --target llama-quantize
-          ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
-          if [ ! -f build/bin/llama-quantize ]; then
-            cmake --build build --config Release -j 1 --target quantize || true
-            ln -sf quantize build/bin/llama-quantize 2>/dev/null || true
-          fi
-
-      - name: Train model (LoRA fine-tuning)
+      - name: Train model (1 epoch daily, 3 epoch weekly)
         env:
           AURUM_BASE_MODEL: 'Qwen/Qwen2.5-3B-Instruct'
-          EPOCHS: '2'
+          EPOCHS: '1'  # Daily: 1 epoch only (lebih cepat)
           BATCH_SIZE: '1'
           GRAD_ACCUM: '4'
-          MAX_LEN: '768'
+          MAX_LEN: '512'  # Kurangi dari 768 → 512 (hemat VRAM/waktu)
           LORA_R: '16'
           LORA_ALPHA: '32'
         run: |
@@ -127,69 +128,51 @@ jobs:
             out/aurum-brain-q4_k_m.gguf
             data/system_prompt.txt
             data/expansion_log.json
-          retention-days: 30
+          retention-days: 7  # Kurangi dari 30 → 7 hari (hemat storage)
 
-      - name: Upload to Hugging Face Hub
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_REPO_ID: arissuga/aurum-brain-ai
-          GITHUB_SHA: ${{ github.sha }}
-        run: |
-          pip install -q huggingface_hub
-          python scripts/upload_to_hf.py
-
-      - name: Cleanup old releases (keep 14 terakhir = ~2 hari)
+      - name: Cleanup old releases (keep 8 terakhir = 2 hari)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "=== Cleanup old releases (keep 14 latest) ==="
-          # 8x/hari × 2 hari = 16 releases, keep 14 untuk safety
+          echo "=== Cleanup old releases (keep 8 latest) ==="
           gh release list --repo "$GITHUB_REPOSITORY" --limit 100 | \
-            awk 'NR > 14 {print $1}' | \
+            awk 'NR > 8 {print $1}' | \
             while read -r tag; do
               if [ -n "$tag" ]; then
                 echo "Deleting old release: $tag"
                 gh release delete "$tag" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
               fi
             done
-          echo "Cleanup done. Remaining releases:"
-          gh release list --repo "$GITHUB_REPOSITORY" --limit 5
+          echo "Remaining releases:"
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 3
 
       - name: Create daily release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Versi: daily-YYYY.MM.DD-HH (unique per run, 8x/hari)
           VER="daily-$(date +%Y.%m.%d-%H)"
           DATASET_SIZE=$(wc -l < data/train.jsonl)
           
-          # Cek apakah release jam ini sudah ada
           if gh release view "$VER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $VER sudah ada, delete dulu..."
             gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
           fi
           
-          # Bikin release notes
           cat > /tmp/release_notes.md << RELEASEEOF
           ## Aurum Brain AI - Build $VER
 
-          AI model auto-trained. Makin pintar tiap 3 jam! 🧠
+          AI model auto-trained. Makin pintar tiap 6 jam! 🧠
 
           ### Spesifikasi
           - Base: Qwen/Qwen2.5-3B-Instruct
           - Fine-tune: LoRA r=16, alpha=32
           - Dataset: $DATASET_SIZE percakapan Bahasa Indonesia
           - Quantization: Q4_K_M (~1GB)
-          - Training: 2 epochs, max_len=768
+          - Training: 1 epoch, max_len=512 (daily)
 
           ### Cara Pakai
           1. Download GGUF
           2. Import ke PocketPal / Ollama / llama.cpp
           3. Set system prompt dari system_prompt.txt
-          4. Mulai chat!
-
-          ### Tracking Progress
-          Lihat expansion_log.json untuk history perkembangan dataset.
 
           Auto-trained: $(date -u)
           RELEASEEOF
@@ -203,34 +186,29 @@ jobs:
             --notes-file /tmp/release_notes.md \
             --latest
           
-          # Save release info untuk Telegram notification
           echo "RELEASE_TAG=$VER" >> $GITHUB_ENV
           echo "DATASET_SIZE=$DATASET_SIZE" >> $GITHUB_ENV
           echo "DOWNLOAD_URL=https://github.com/$GITHUB_REPOSITORY/releases/download/$VER/aurum-brain-q4_k_m.gguf" >> $GITHUB_ENV
 
-      - name: Notify Telegram (training complete)
+      - name: Notify Telegram
         if: success()
         run: |
-          # Kirim notif ke Telegram bot worker
           curl -s -X POST "https://aurum-telegram-bot.cakagus.workers.dev/webhook" \
             -H "Content-Type: application/json" \
             -d "{
               \"event\": \"training_complete\",
               \"release_tag\": \"${RELEASE_TAG}\",
               \"dataset_size\": \"${DATASET_SIZE}\",
-              \"model_info\": \"Qwen2.5-3B Q4_K_M\",
+              \"model_info\": \"Qwen2.5-3B Q4_K_M (1 epoch)\",
               \"download_url\": \"${DOWNLOAD_URL}\"
-            }" || echo "Telegram notify failed (OK, tidak block workflow)"
+            }" || echo "Telegram notify failed (OK)"
 
-      - name: Save expansion log via GitHub API
+      - name: Save expansion log
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ ! -f data/expansion_log.json ]; then
-            echo "No expansion_log.json, skip"
-            exit 0
-          fi
+          if [ ! -f data/expansion_log.json ]; then exit 0; fi
           
           CONTENT=$(base64 -w 0 data/expansion_log.json)
           
@@ -239,9 +217,7 @@ jobs:
             | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))" 2>/dev/null || echo "")
           
           SHA_JSON=""
-          if [ -n "$FILE_SHA" ]; then
-            SHA_JSON=",\"sha\":\"$FILE_SHA\""
-          fi
+          if [ -n "$FILE_SHA" ]; then SHA_JSON=",\"sha\":\"$FILE_SHA\""; fi
           
           curl -s -X PUT \
             -H "Authorization: token $GH_TOKEN" \
@@ -249,4 +225,4 @@ jobs:
             "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/data/expansion_log.json" \
             -d "{\"message\":\"chore: update expansion log [skip ci]\",\"content\":\"$CONTENT\",\"branch\":\"main\"$SHA_JSON}" \
             | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'OK: {d[\"commit\"][\"sha\"][:7]}') if d.get('commit') else print(f'Skip: {d.get(\"message\",\"?\")}')" \
-            || echo "Commit failed (OK, tidak block workflow)"
+            || echo "Commit failed (OK)"
