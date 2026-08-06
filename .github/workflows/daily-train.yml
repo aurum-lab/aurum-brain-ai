@@ -2,10 +2,8 @@ name: Daily Train - AI belajar tiap hari (Optimized)
 
 on:
   schedule:
-    # Setiap 6 jam = 4x sehari (aman untuk free tier 6 jam limit)
-    # 00:00, 06:00, 12:00, 18:00 UTC
-    # = 07:00, 13:00, 19:00, 01:00 WIB
-    - cron: "0 */6 * * *"
+    # Sekali sehari jam 00:00 UTC = 07:00 WIB
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -24,7 +22,7 @@ concurrency:
 jobs:
   daily-train:
     runs-on: ubuntu-latest
-    timeout-minutes: 300  # 5 jam max (buffer 1 jam dari 6 jam limit)
+    timeout-minutes: 300  # 5 jam max
     steps:
       - uses: actions/checkout@v4
 
@@ -35,7 +33,7 @@ jobs:
 
       - name: Free disk space
         run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc 2>/dev/null || true
           df -h
 
       # === CACHE llama.cpp build (save 15-20 min per run) ===
@@ -57,30 +55,43 @@ jobs:
       - name: Build llama.cpp (only if cache miss)
         if: steps.llama-cache.outputs.cache-hit != 'true'
         run: |
+          set -e
           git clone --depth 1 https://github.com/ggerganov/llama.cpp
           cd llama.cpp
           cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
-          cmake --build build --config Release -j 2 --target llama-quantize
-          ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
-          if [ ! -f build/bin/llama-quantize ]; then
-            cmake --build build --config Release -j 2 --target quantize || true
+          cmake --build build --config Release -j 2 --target llama-quantize 2>&1 | tail -20
+          # Coba kedua nama binary yang mungkin
+          if [ -f build/bin/llama-quantize ]; then
+            ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
+          elif [ -f build/bin/quantize ]; then
             ln -sf quantize build/bin/llama-quantize 2>/dev/null || true
+          else
+            echo "WARNING: quantize binary not found, trying to build quantize target"
+            cmake --build build --config Release -j 2 --target quantize 2>&1 | tail -10
+            if [ -f build/bin/quantize ]; then
+              ln -sf quantize build/bin/llama-quantize
+            fi
           fi
+          # Verifikasi
+          ls -la build/bin/ | grep -E "quantize|llama-quantize" || echo "WARNING: quantize not found"
 
       - name: Expand dataset (hanya kalau < 150 convos)
         run: |
           CURRENT_SIZE=$(python3 -c "
           import json
-          with open('data/conversations_source.json') as f:
-            print(len(json.load(f)))
+          try:
+            with open('data/conversations_source.json') as f:
+              print(len(json.load(f)))
+          except:
+            print(0)
           " 2>/dev/null || echo 0)
           
           echo "Current dataset size: $CURRENT_SIZE conversations"
           
           if [ "$CURRENT_SIZE" -lt 150 ]; then
             echo "Dataset <150, expand..."
-            python scripts/expand_dataset.py
-            python scripts/expand_agent_dataset.py || true
+            python scripts/expand_dataset.py || echo "expand_dataset.py failed, continuing..."
+            python scripts/expand_agent_dataset.py || echo "expand_agent_dataset.py failed, continuing..."
           else
             echo "Dataset >=150, skip expand (cap reached)"
           fi
@@ -108,6 +119,8 @@ jobs:
           ls -la out/
           if [ ! -f out/aurum-brain-q4_k_m.gguf ]; then
             echo "ERROR: GGUF file tidak ditemukan!"
+            echo "Files in out/:"
+            ls -la out/
             exit 1
           fi
           echo "GGUF size: $(du -h out/aurum-brain-q4_k_m.gguf)"
@@ -128,14 +141,14 @@ jobs:
             out/aurum-brain-q4_k_m.gguf
             data/system_prompt.txt
             data/expansion_log.json
-          retention-days: 7  # Kurangi dari 30 → 7 hari (hemat storage)
+          retention-days: 7
 
       - name: Cleanup old releases (keep 8 terakhir = 2 hari)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "=== Cleanup old releases (keep 8 latest) ==="
-          gh release list --repo "$GITHUB_REPOSITORY" --limit 100 | \
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 100 2>/dev/null | \
             awk 'NR > 8 {print $1}' | \
             while read -r tag; do
               if [ -n "$tag" ]; then
@@ -157,10 +170,10 @@ jobs:
             gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
           fi
           
-          cat > /tmp/release_notes.md << RELEASEEOF
+          cat > /tmp/release_notes.md << 'RELEASEEOF'
           ## Aurum Brain AI - Build $VER
 
-          AI model auto-trained. Makin pintar tiap 6 jam! 🧠
+          AI model auto-trained. Makin pintar tiap hari! 🧠
 
           ### Spesifikasi
           - Base: Qwen/Qwen2.5-3B-Instruct
