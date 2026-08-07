@@ -1,244 +1,306 @@
 # 🧠 Aurum Brain AI
 
-> AI buatan sendiri — fine-tuned dari Qwen2.5-3B-Instruct untuk **Bahasa Indonesia**, **coding expert**, dan **percakapan pintar**.
+> **AI buatan Indonesia** — fine-tuned dari **Qwen2.5-3B-Instruct** untuk **Bahasa Indonesia native**, **coding expert**, dan **percakapan pintar**.
 > 
-> Output format: GGUF (siap import ke **PocketPal**, **Ollama**, **LM Studio**, **llama.cpp**).
-> 
-> 🤖 **Telegram Bot**: [@Tessstyx_bot](https://t.me/Tessstyx_bot) — chat langsung dengan AI + monitoring training
+> Output: **GGUF Q4_K_M** (~2GB) — siap pakai di **PocketPal (HP)**, **Ollama**, **LM Studio**, **llama.cpp** — **100% offline**, gratis selamanya.
 
-![Model](https://img.shields.io/badge/Model-Qwen2.5--1.5B-blue)
-![Format](https://img.shields.io/badge/Format-GGUF_Q4__K__M-green)
+![Model](https://img.shields.io/badge/Base-Qwen2.5--3B--Instruct-blue)
+![Fine-tune](https://img.shields.io/badge/Method-LoRA%20(r%3D32%2C%20alpha%3D64)-purple)
+![Format](https://img.shields.io/badge/Format-GGUF%20Q4_K__M-green)
 ![Size](https://img.shields.io/badge/Size-~2GB-orange)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
-![Daily Training](https://img.shields.io/badge/Auto_Train-8x/day-purple)
+![Auto Train](https://img.shields.io/badge/Auto_Train-Daily%20(NVIDIA--style)-red)
 
-**Links:**
-- 📦 [Download GGUF](https://github.com/aurum-lab/aurum-brain-ai/releases)
-- 🤖 [Telegram Bot](https://t.me/Tessstyx_bot)
-- ☁️ [Cloudflare AI Server](https://aurum-brain-server.cakagus.workers.dev/health)
-- 📊 [Training Status](https://github.com/aurum-lab/aurum-brain-ai/actions)
+---
 
 ## 🎯 Apa Ini?
 
-**Aurum Brain AI** adalah model AI custom yang di-fine-tune dari Qwen2.5-3B-Instruct dengan dataset Bahasa Indonesia berkualitas. Dirancang untuk:
+**Aurum Brain AI** adalah model bahasa custom yang di-fine-tune dari **Qwen2.5-3B-Instruct** menggunakan dataset Bahasa Indonesia berkualitas tinggi (39+ percakapan, terus bertambah via auto-expansion).
 
-- 🇮🇩 **Bahasa Indonesia natural** — bukan terjemahan, tapi native
-- 💻 **Coding expert** — Python, JS/TS, Rust, Go, SQL, dan 25+ bahasa lainnya
+**Kelebihan:**
+- 🇮🇩 **Bahasa Indonesia native** — bukan terjemahan, tapi natural & santai
+- 💻 **Coding expert** — Python, JS/TS, Rust, Go, SQL, dan 25+ bahasa
 - 🧠 **Problem solver** — debugging, arsitektur, optimasi, best practice
-- 💬 **Percakapan pintar** — teknologi, sains, bisnis, edukasi
+- 💬 **Percakapan pintar** — tech, sains, bisnis, edukasi, daily life
+- 🔒 **100% Privasi** — jalan offline di device Anda, zero data keluar
+- 💰 **Gratis selamanya** — no subscription, no API key, no server
 
-Model ini berjalan **100% offline** di HP atau komputer Anda. Tidak ada data yang dikirim ke server. Tidak butuh internet. Gratis selamanya.
+---
 
-## 📥 Download
+## 📥 Download Model
 
-**Langsung dari GitHub Releases:**
-👉 **https://github.com/aurum-lab/aurum-brain-ai/releases/latest**
+**GitHub Releases (terbaru):**
+👉 **[https://github.com/aurum-lab/aurum-brain-ai/releases/latest](https://github.com/aurum-lab/aurum-brain-ai/releases/latest)**
 
-File yang dibutuhkan:
-- `aurum-brain-q4_k_m.gguf` (~2GB) — model utama
-- `system_prompt.txt` (~4KB) — personality AI (WAJIB set di PocketPal)
+**Hugging Face Hub:**
+👉 **[arissuga/aurum-brain-ai](https://huggingface.co/arissuga/aurum-brain-ai)** — `aurum-brain-q4_k_m.gguf` + `system_prompt.txt`
 
-## 📱 Cara Pakai
+**File wajib:**
+| File | Ukuran | Fungsi |
+|------|--------|--------|
+| `aurum-brain-q4_k_m.gguf` | ~2GB | Model utama (quantized Q4_K_M) |
+| `system_prompt.txt` | ~4KB | **WAJIB** — personality AI (set di PocketPal/Ollama/LM Studio) |
 
-### Cloudflare Worker (Remote Server — Paling Gampang)
-AI server gratis via Cloudflare. Pakai Llama 3.3 70B, tidak perlu install apapun.
+---
 
-| Field | Value |
-|-------|-------|
-| **Base URL** | `https://aurum-brain-server.cakagus.workers.dev/v1` |
-| **API Key** | `sk-aurum-brain-aeb07f01e56285f4c58cadcdc67afbc8` |
-| **Model** | `aurum-brain` |
+## 📱 Cara Pakai (Pilih Satu)
 
-### Telegram Bot
-Chat langsung dengan AI di Telegram: **@Tessstyx_bot**
+### 1. PocketPal (Android/iOS — Offline HP) ⭐ **Recommended**
+> Paling gampang untuk HP, UI bagus, support system prompt.
+1. Install **PocketPal** (Play Store / GitHub / F-Droid)
+2. **Models** → **Add Model** → pilih `aurum-brain-q4_k_m.gguf`
+3. **Settings** → **System Prompt** → paste isi `system_prompt.txt`
+4. Chat! 🎉
 
-### PocketPal (HP — Offline)
-Lihat **[docs/POCKETPAL.md](docs/POCKETPAL.md)** untuk panduan lengkap.
+📖 Detail: **[docs/POCKETPAL.md](docs/POCKETPAL.md)**
 
-### Ollama (Mac/Linux/Windows)
-Lihat **[docs/OLLAMA.md](docs/OLLAMA.md)**.
+---
 
-### LM Studio (GUI)
-Lihat **[docs/LMSTUDIO.md](docs/LMSTUDIO.md)**.
-
-### llama.cpp (CLI)
+### 2. Ollama (Mac/Linux/Windows — CLI + API)
 ```bash
-./main -m aurum-brain-q4_k_m.gguf -p "Halo, siapa kamu?" -n 200
+# Buat modelfile (sudah ada di repo)
+ollama create aurum-brain -f modelfile
+
+# Atau manual import GGUF
+ollama create aurum-brain -f ./Modelfile
+# Modelfile isi:
+# FROM ./aurum-brain-q4_k_m.gguf
+# SYSTEM """$(cat system_prompt.txt)"""
+# PARAMETER temperature 0.7
+# PARAMETER top_p 0.9
+# PARAMETER num_ctx 4096
+
+# Jalankan
+ollama run aurum-brain "Halo, siapa kamu?"
 ```
 
-## 🏗️ Arsitektur
+📖 Detail: **[docs/OLLAMA.md](docs/OLLAMA.md)**
+
+---
+
+### 3. LM Studio (GUI — Desktop)
+1. Buka LM Studio → **Models** → **Add Model** → drag `aurum-brain-q4_k_m.gguf`
+2. **Settings** (⚙️) → **System Prompt** → paste `system_prompt.txt`
+4. **Chat** tab → pilih model → mulai chat
+5. Bisa juga **Local Server** (OpenAI-compatible) → `http://localhost:1234/v1`
+
+📖 Detail: **[docs/LMSTUDIO.md](docs/LMSTUDIO.md)**
+
+---
+
+### 4. llama.cpp (CLI — Minimal)
+```bash
+# Build llama.cpp
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp && make -j
+
+# Chat
+./main -m aurum-brain-q4_k_m.gguf -p "Halo, siapa kamu?" -n 200 -c 4096 --temp 0.7
+
+# Server mode (OpenAI-compatible)
+./server -m aurum-brain-q4_k_m.gguf -c 4096 --port 8080
+# Lalu pakai curl / OpenAI SDK ke http://localhost:8080/v1
+```
+
+---
+
+## 🏗️ Struktur Repo
 
 ```
 aurum-brain-ai/
 ├── data/
-│   ├── system_prompt.txt              # Personality AI (IQ tinggi, jago coding)
-│   ├── conversations_source.json      # 39 percakapan Bahasa Indonesia
-│   └── train.jsonl                    # Dataset format ChatML (auto-generated)
+│   ├── system_prompt.txt          # Personality AI (IQ tinggi, jago coding, Bahasa Indonesia native)
+│   ├── conversations_source.json  # 39+ percakapan source (manual curated)
+│   ├── train.jsonl                # Dataset ChatML format (auto-generated dari source)
+│   └── expansion_log.json         # Log auto-expansion dataset harian
 ├── scripts/
-│   ├── generate_source.js             # Generator dataset (Node.js)
-│   ├── build_dataset.py               # Builder JSONL dari source
-│   └── train.py                       # LoRA fine-tuning script
+│   ├── generate_source.js         # Generator variasi dataset (Node.js)
+│   ├── build_dataset.py           # Build train.jsonl dari conversations_source.json
+│   └── train.py                   # LoRA fine-tuning script (Transformers + PEFT)
 ├── .github/workflows/
-│   ├── train.yml                      # Auto-train + release GGUF
-│   └── starter-release.yml            # Starter model (Qwen2.5-3B) cepat
+│   ├── train.yml                  # Manual trigger: train + release GGUF
+│   ├── daily-train.yml            # Scheduled daily: expand dataset → train → release
+│   └── starter-release.yml        # Quick release base model (Qwen2.5-3B)
 ├── docs/
-│   ├── POCKETPAL.md                   # Import ke PocketPal (HP)
-│   ├── OLLAMA.md                      # Pakai dengan Ollama
-│   ├── LMSTUDIO.md                    # Pakai dengan LM Studio
-│   └── CUSTOMIZE.md                   # Cara kustomisasi AI
-├── modelfile                          # Ollama modelfile
+│   ├── POCKETPAL.md               # Panduan PocketPal
+│   ├── OLLAMA.md                  # Panduan Ollama
+│   ├── LMSTUDIO.md                # Panduan LM Studio
+│   └── CUSTOMIZE.md               # Cara kustomisasi dataset/prompt
+├── modelfile                      # Ollama modelfile template
 └── README.md
 ```
 
-**Note:** Untuk chat online, pakai Cloudflare Worker atau Telegram bot. Lihat section "Cara Pakai" di atas.
+---
 
-## 🧬 Spesifikasi Model
+## 🧬 Spesifikasi Model Teknis
 
-| Aspek | Detail |
-|-------|--------|
+| Parameter | Nilai |
+|-----------|-------|
 | **Base model** | Qwen/Qwen2.5-3B-Instruct |
 | **Fine-tune method** | LoRA (Low-Rank Adaptation) |
-| **LoRA rank** | r=32, alpha=64 |
+| **LoRA rank (r)** | 32 |
+| **LoRA alpha** | 64 |
+| **LoRA dropout** | 0.05 |
 | **Target modules** | q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj |
-| **Training epochs** | 3 |
-| **Quantization** | Q4_K_M |
+| **Training epochs** | 3 (per run) |
+| **Batch size** | 1 |
+| **Gradient accumulation** | 4 |
+| **Max sequence length** | 768 tokens |
+| **Learning rate** | 2e-4 |
+| **Optimizer** | AdamW 8-bit |
+| **Quantization** | Q4_K_M (llama.cpp k-quant) |
 | **Output format** | GGUF (llama.cpp compatible) |
-| **File size** | ~2GB |
-| **Context length** | 4096 tokens (~3000 kata) |
-| **Min RAM** | 4GB (mobile), 8GB (desktop) |
+| **File size** | ~2 GB |
+| **Context window** | 4096 tokens (~3000 kata) |
+| **Min RAM** | 4 GB (mobile), 8 GB (desktop) |
+| **License** | MIT (base model: Tongyi Qianwen License) |
 
-## 🎨 Personality AI
+---
 
-AI dirancang dengan karakter:
+## 🎨 Personality AI (System Prompt)
 
-- **Percaya diri** — jawaban to the point, tidak ragu
-- **Expert** — ahli di coding, software engineering, problem solving
-- **Bahasa Indonesia** — formal tapi santai, jangan kaku
-- **Anti-emoji berlebihan** — maksimal 1-2 emoji per response
-- **Tidak mulai dengan "Baik," atau "Tentu,"** — langsung ke substansi
-- **Jujur kalau tidak yakin** — tidak halusinasi
+AI dirancang dengan karakter konsisten via `system_prompt.txt`:
 
-Detail lengkap di **[data/system_prompt.txt](data/system_prompt.txt)**.
+- **Percaya diri & to the point** — tidak ragu, tidak bertele-tele
+- **Expert teknis** — coding, software engineering, debugging, arsitektur
+- **Bahasa Indonesia native** — formal tapi santai, natural, tidak kaku terjemahan
+- **Anti-emoji berlebihan** — max 1-2 emoji per response
+- **Tidak robotic** — tidak mulai dengan "Baik,", "Tentu,", "Berikut adalah"
+- **Jujur** — kalau tidak yakin, bilang tidak yakin; tidak halusinasi
+- **Proactive** — tawarkan alternatif, kasih best practice, explain *why*
+
+📄 **Lihat lengkap:** `data/system_prompt.txt` (copy-paste ke PocketPal/Ollama/LM Studio)
+
+---
 
 ## 📊 Dataset Training
 
-39 percakapan Bahasa Indonesia berkualitas tinggi, mencakup:
+**39+ percakapan Bahasa Indonesia berkualitas tinggi**, categories:
 
-**Programming Languages:**
-- **Python**: list/tuple/set, decorator, performance optimization
-- **JavaScript/TypeScript**: var/let/const, debounce, async/await
-- **Rust**: ownership, borrowing
-- **Go**: goroutine, channel
-- **SQL**: index, query optimization
+| Kategori | Contoh Topik |
+|----------|--------------|
+| **Python** | list/tuple/set, decorator, performance opt, async |
+| **JavaScript/TypeScript** | var/let/const, debounce, async/await, React hooks |
+| **Rust** | ownership, borrowing, lifetimes |
+| **Go** | goroutine, channel, error handling |
+| **SQL** | index, query optimization, EXPLAIN ANALYZE |
+| **Web Dev** | landing page, form validation, Next.js API, dark mode, carousel |
+| **Software Eng** | debugging, microservices vs monolith, Git, Docker, security, testing |
+| **General** | siapa kamu, belajar programming, problem solving |
 
-**Web Development (khusus untuk bikin website):**
-- Landing page HTML/CSS responsive
-- Form login dengan validation (React + Zod)
-- Next.js API route untuk upload file ke S3
-- Navbar responsive dengan hamburger menu
-- Carousel/slider image tanpa library
-- Dark mode toggle di Next.js + Tailwind
-- Modal/dialog dengan aksesibilitas (focus trap, ARIA)
-- Tailwind vs CSS biasa comparison
-- Deploy Next.js ke Vercel
-- Loading skeleton dengan shimmer effect
-- Infinite scroll dengan IntersectionObserver
+**Auto-expansion harian** (mirip NVIDIA Nemotron):
+- Setiap hari jam **10:00 WIB** (03:00 UTC) via `daily-train.yml`
+- Dataset di-expand: paraphrasing, variasi kode baru, konteks tambahan
+- LoRA re-train dari checkpoint terbaru
+- Release GGUF baru otomatis ke GitHub Releases + HF Hub
+- Cleanup release lama (keep 7 terbaru)
+- Tracking: `data/expansion_log.json`
 
-**Software Engineering:**
-- Debugging: NoneType error, common pitfalls
-- Architecture: microservices vs monolith
-- Database: SQL vs NoSQL
-- Git: rebase vs merge
-- DevOps: Docker compose
-- Security: password hashing
-- Algorithm: Big O, hash table
-- API Design: REST best practices
-- Testing: unit vs integration test
+---
 
-**Percakapan Umum:**
-- Siapa kamu, makna hidup, belajar programming
+## 🔄 Auto-Training & Release Pipeline
 
-Tambah data Anda sendiri di **`scripts/generate_source.js`**.
-
-## 🔄 Auto-Update
-
-### Manual Training (on push)
-Setiap kali ada perubahan di `data/` atau `scripts/`, GitHub Actions akan:
-1. Build dataset baru
-2. Train model dari awal (LoRA fine-tuning, ~25 menit)
-3. Convert ke GGUF Q4_K_M
-4. Upload sebagai artifact
-5. Create GitHub Release baru dengan GGUF siap download
-
-Manual trigger:
+### Manual Trigger (kapan saja)
 ```bash
+# Trigger training + release GGUF
 gh workflow run train.yml -R aurum-lab/aurum-brain-ai
-```
 
-### 🆕 Daily Auto-Training (mirip NVIDIA)
-AI **belajar tiap hari** otomatis:
-- ⏰ Setiap hari jam **10:00 WIB** (03:00 UTC)
-- 📚 Dataset di-expand dengan variasi baru (paraphrasing, contoh kode baru)
-- 🧠 Training LoRA fine-tuning ulang
-- 📦 Release baru otomatis di GitHub Releases
-- 🗑️ Auto-cleanup release lama (keep 7 terbaru)
-- 📊 Progress tracking di `data/expansion_log.json`
-
-**Mirip NVIDIA yang terus improve model mereka** — semakin lama, AI makin pintar karena dataset makin besar + variatif.
-
-Track progress:
-```bash
-# Lihat history ekspansi dataset
-curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/expansion_log.json | python3 -m json.tool
-
-# Lihat semua versi daily
-gh release list -R aurum-lab/aurum-brain-ai --limit 10
-```
-
-Manual trigger daily training:
-```bash
+# Trigger daily-style expansion + train
 gh workflow run daily-train.yml -R aurum-lab/aurum-brain-ai
+
+# Quick starter release (base model only)
+gh workflow run starter-release.yml -R aurum-lab/aurum-brain-ai
 ```
 
-## 🆚 Perbandingan dengan AI Lain
+### Scheduled (Otomatis)
+| Workflow | Schedule | Aksi |
+|----------|----------|------|
+| `daily-train.yml` | Daily 03:00 UTC (10:00 WIB) | Expand dataset → LoRA train → GGUF → Release |
+| `train.yml` | On push `data/`, `scripts/` | Build dataset → Train → Release |
 
-| Aspek | Aurum Brain AI | ChatGPT/Gemini | Llama 3.2 (3B) |
-|-------|----------------|----------------|----------------|
-| Bahasa Indonesia | Native fine-tuned | Multilingual default | Multilingual default |
-| Coding ability | Good (dataset fokus) | Excellent | Good |
-| Privacy | 100% lokal | Cloud (data dikirim) | 100% lokal |
-| Cost | Gratis selamanya | Berlangganan | Gratis |
-| Offline | Ya | Tidak | Ya |
-| Customizable | Bisa retrain | Tidak | Bisa retrain |
-| Size | 2GB (Q4) | Cloud (100B+) | 2GB (Q4) |
+### Release Output
+Setiap release berisi:
+- `aurum-brain-q4_k_m.gguf` — model quantized siap pakai
+- `system_prompt.txt` — personality (WAJIB di-set di client)
+- `merged/` (opsional) — fused LoRA weights untuk training lanjut
 
-## 📈 Roadmap
+---
 
-- [x] v1.0 — Base release dengan 28 percakapan
-- [ ] v1.1 — Tambah 50+ percakapan (mobile dev, ML, devops)
-- [ ] v1.2 — Variant Q5_K_M untuk quality lebih tinggi
-- [ ] v1.3 — Base model Qwen2.5-7B (HP flagship only)
-- [ ] v2.0 — Multi-modal (text + image input)
-- [ ] v2.1 — Function calling support
+## 📈 Monitoring & Progress
 
-## ⚠️ Disclaimer
+```bash
+# Cek workflow runs (status training)
+gh run list -R aurum-lab/aurum-brain-ai --limit 10
 
-- **Bukan saran finansial/legal/medis** — selalu konsultasi professional
-- Model bisa **halusinasi** — verify info penting dari sumber terpercaya
-- Fine-tune pada dataset kecil (28 contoh) — kualitas terbatas dibanding model 100B+
-- Untuk task critical, pakai model cloud (ChatGPT/Claude/Gemini)
+# Cek release history
+gh release list -R aurum-lab/aurum-brain-ai --limit 10
+
+# Lihat expansion log (dataset growth)
+curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/expansion_log.json | jq .
+
+# Lihat dataset source terkini
+curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/conversations_source.json | jq length
+```
+
+---
+
+## 🆚 Perbandingan
+
+| Aspek | Aurum Brain AI | ChatGPT/Claude/Gemini | Llama 3.2 3B (base) |
+|-------|----------------|------------------------|---------------------|
+| **Bahasa Indonesia** | ✅ Native fine-tuned | 🌐 Multilingual (biasa) | 🌐 Multilingual (biasa) |
+| **Coding** | ✅ Good (dataset fokus) | ✅ Excellent | ✅ Good |
+| **Privasi** | ✅ 100% Lokal | ❌ Cloud (data dikirim) | ✅ 100% Lokal |
+| **Biaya** | ✅ Gratis selamanya | 💰 Subscription | ✅ Gratis |
+| **Offline** | ✅ Ya | ❌ Tidak | ✅ Ya |
+| **Customizable** | ✅ Bisa retrain | ❌ Tidak | ✅ Bisa retrain |
+| **Ukuran** | 2 GB (Q4) | Cloud (100B+) | 2 GB (Q4) |
+| **System Prompt** | ✅ Custom (wajib) | ⚠️ Limited | ⚠️ Manual |
+
+---
+
+## 🗺️ Roadmap
+
+- [x] **v1.0** — Base release 28 percakapan
+- [x] **v1.1** — 39+ percakapan, daily auto-train pipeline
+- [ ] **v1.2** — Variant Q5_K_M / Q8_0 untuk quality lebih tinggi
+- [ ] **v1.3** — Base model upgrade ke Qwen2.5-7B (HP flagship)
+- [ ] **v2.0** — Multi-modal (text + image input via LLaVA)
+- [ ] **v2.1** — Function calling / tool use support
+- [ ] **v3.0** — RAG integration (local knowledge base)
+
+---
+
+## ⚠️ Disclaimer & Batasan
+
+- ❌ **Bukan saran finansial/legal/medis** — konsultasi profesional
+- ⚠️ **Bisa halusinasi** — verify info kritis dari sumber terpercaya
+- 📊 **Dataset relatif kecil** (39+ contoh) — kualitas terbatas vs model 100B+
+- 🧪 **Fine-tune LoRA** — bukan full fine-tune, base knowledge dari Qwen2.5
+- 📱 **Mobile (4GB RAM)** — jalan tapi lambat; rekomendasi 6GB+
+- 🔧 **Untuk task kritis** — pakai model cloud (Claude, GPT-4o, Gemini)
+
+---
 
 ## 📜 License
 
-MIT — bebas pakai, modifikasi, distribusi. Atribusi dihargai tapi tidak wajib.
+**MIT License** — bebas pakai, modifikasi, distribusi, komersial.
+Atribusi dihargai tapi tidak wajib.
+
+**Base model:** Qwen2.5-3B-Instruct — [Tongyi Qianwen License](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/LICENSE)
+
+---
 
 ## 🙏 Credits
 
-- **Base model**: [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) by Alibaba
-- **Training framework**: [Transformers](https://github.com/huggingface/transformers) + [PEFT](https://github.com/huggingface/peft)
-- **GGUF conversion**: [llama.cpp](https://github.com/ggerganov/llama.cpp)
-- **Dataset**: Curated oleh Aurum Lab
+- **Base model:** [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) oleh **Alibaba Cloud**
+- **Training framework:** [Transformers](https://github.com/huggingface/transformers) + [PEFT](https://github.com/huggingface/peft) oleh **Hugging Face**
+- **Quantization/GGUF:** [llama.cpp](https://github.com/ggerganov/llama.cpp) oleh **Georgi Gerganov**
+- **Dataset & Fine-tune:** **Aurum Lab** (curated manual + auto-expansion)
+- **Infrastructure:** GitHub Actions (free runners), Hugging Face Hub (model hosting)
 
 ---
 
 **Made with 🧠 by [Aurum Lab](https://github.com/aurum-lab)**
+
+> *"AI yang paham Bahasa Indonesia, bukan cuma terjemahan."*
