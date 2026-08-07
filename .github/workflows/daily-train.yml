@@ -36,12 +36,12 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc 2>/dev/null || true
           df -h
 
-      # === CACHE llama.cpp build (save 15-20 min per run) ===
+      # === CACHE llama.cpp (FULL DIR - include convert script) ===
       - name: Cache llama.cpp
         id: llama-cache
         uses: actions/cache@v4
         with:
-          path: llama.cpp/build
+          path: llama.cpp
           key: llama-cpp-${{ runner.os }}-${{ hashFiles('scripts/train.py') }}
           restore-keys: |
             llama-cpp-${{ runner.os }}-
