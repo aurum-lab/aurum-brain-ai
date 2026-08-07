@@ -1,18 +1,7 @@
 #!/usr/bin/env python3
 """
 Train Aurum Brain AI - LoRA fine-tuning di Qwen2.5-3B-Instruct.
-
-Output: out/aurum-brain-q4_k_m.gguf (siap import ke PocketPal/Ollama/llama.cpp)
-
-Pipeline:
-1. Load Qwen2.5-3B-Instruct sebagai base model
-2. Apply LoRA (r=32, alpha=64) - fine-tune pada dataset Indonesia
-3. Train 3 epoch
-4. Merge LoRA weights ke base
-5. Convert ke GGUF format (llama.cpp)
-6. Quantize ke Q4_K_M (sekitar 2GB, optimal untuk mobile)
-
-Run di GitHub Actions (free tier, ~30 menit) atau lokal (butuh GPU 8GB+ / CPU 16GB RAM).
+Output: out/aurum-brain-q4_k_m.gguf
 """
 
 import json
@@ -21,12 +10,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-# Setup
 os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-# Konfigurasi - bisa di-override via environment variable
-# Default ke 3B (2x lebih pintar dari 1.5B, masih bisa jalan di HP RAM 4GB)
 BASE_MODEL = os.environ.get("AURUM_BASE_MODEL", "Qwen/Qwen2.5-3B-Instruct")
 DATA_PATH = Path(__file__).parent.parent / "data" / "train.jsonl"
 OUT_DIR = Path(__file__).parent.parent / "out"
@@ -34,7 +20,6 @@ ADAPTER_DIR = OUT_DIR / "adapter"
 MERGED_DIR = OUT_DIR / "merged"
 GGUF_PATH = OUT_DIR / "aurum-brain-q4_k_m.gguf"
 
-# LoRA config - r=16 untuk hemat memory + cepat
 LORA_R = int(os.environ.get("LORA_R", "16"))
 LORA_ALPHA = int(os.environ.get("LORA_ALPHA", "32"))
 LORA_DROPOUT = float(os.environ.get("LORA_DROPOUT", "0.05"))
@@ -44,9 +29,7 @@ GRAD_ACCUM = int(os.environ.get("GRAD_ACCUM", "4"))
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "2e-4"))
 MAX_LEN = int(os.environ.get("MAX_LEN", "768"))
 
-
 def load_and_tokenize(tokenizer, path, max_len=1024):
-    """Load JSONL dataset dan tokenize dengan ChatML template."""
     rows = []
     with open(path, encoding='utf-8') as f:
         for line in f:
@@ -74,24 +57,18 @@ def load_and_tokenize(tokenizer, path, max_len=1024):
     input_ids_list = enc["input_ids"]
     attn_list = enc["attention_mask"]
     
-    # Mask prompt tokens dengan -100 (hanya train bagian assistant)
     labels_list = []
-    # Cari marker ChatML untuk assistant
-    marker_text = "<|im_start|>assistant"
+    marker_text = "<|im_start|>assistant\n"
     marker_ids = tokenizer.encode(marker_text, add_special_tokens=False)
     
     for i, ids in enumerate(input_ids_list):
-        # Cari posisi marker assistant (scan dari belakang)
         idx = -1
         for j in range(len(ids) - len(marker_ids), -1, -1):
             if ids[j:j + len(marker_ids)] == marker_ids:
                 idx = j + len(marker_ids)
                 break
-        
         if idx == -1:
-            idx = len(ids) // 2  # fallback
-        
-        # Label: -100 untuk prompt, input_ids untuk assistant response
+            idx = len(ids) // 2
         lbl = [-100] * idx + ids[idx:]
         lbl = lbl[:max_len] + [-100] * max(0, max_len - len(lbl))
         labels_list.append(lbl)
@@ -101,7 +78,6 @@ def load_and_tokenize(tokenizer, path, max_len=1024):
         "attention_mask": attn_list,
         "labels": labels_list,
     }
-
 
 def main():
     print("=" * 60)
@@ -116,13 +92,11 @@ def main():
     print(f"  Output GGUF: {GGUF_PATH}")
     print("=" * 60)
     
-    # Validate dataset exists
     if not DATA_PATH.exists():
         print(f"ERROR: Dataset tidak ditemukan di {DATA_PATH}")
         print("Jalankan: python scripts/build_dataset.py")
         sys.exit(1)
     
-    # === STEP 1: Load tokenizer & model ===
     print("\n[1/6] Load tokenizer & model...")
     from transformers import AutoModelForCausalLM, AutoTokenizer
     import torch
@@ -131,7 +105,6 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    # Load model - float16 untuk hemat memory
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
@@ -140,7 +113,6 @@ def main():
     )
     print(f"   OK Model loaded. dtype={dtype}")
     
-    # === STEP 2: Apply LoRA ===
     print("\n[2/6] Setup LoRA adapter...")
     from peft import LoraConfig, get_peft_model, TaskType
     
@@ -155,7 +127,6 @@ def main():
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
     
-    # === STEP 3: Tokenize dataset ===
     print("\n[3/6] Tokenize dataset...")
     data = load_and_tokenize(tokenizer, DATA_PATH, MAX_LEN)
     
@@ -167,7 +138,6 @@ def main():
     dataset = Dataset.from_list(ds_dict)
     print(f"   OK Dataset ready: {len(dataset)} examples")
     
-    # === STEP 4: Train ===
     print("\n[4/6] Start training...")
     from transformers import Trainer, TrainingArguments
     
@@ -197,22 +167,18 @@ def main():
     trainer.train()
     print("   OK Training selesai")
     
-    # === STEP 5: Merge LoRA & save ===
     print("\n[5/6] Merge LoRA weights & save...")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     
-    # Save adapter
     model.save_pretrained(str(ADAPTER_DIR))
     tokenizer.save_pretrained(str(ADAPTER_DIR))
     
-    # Merge untuk GGUF conversion
     merged_model = model.merge_and_unload()
     MERGED_DIR.mkdir(parents=True, exist_ok=True)
     merged_model.save_pretrained(str(MERGED_DIR), safe_serialization=True)
     tokenizer.save_pretrained(str(MERGED_DIR))
     print(f"   OK Merged model saved ke {MERGED_DIR}")
     
-    # === STEP 6: Convert ke GGUF ===
     print("\n[6/6] Convert ke GGUF (Q4_K_M)...")
     convert_to_gguf()
     
@@ -220,18 +186,19 @@ def main():
     print("  TRAINING SELESAI!")
     print("=" * 60)
     print(f"  GGUF file: {GGUF_PATH}")
-    print(f"  Size: {GGUF_PATH.stat().st_size / 1024 / 1024:.1f} MB" if GGUF_PATH.exists() else "  GGUF belum ada")
+    if GGUF_PATH.exists():
+        print(f"  Size: {GGUF_PATH.stat().st_size / 1024 / 1024:.1f} MB")
     print()
     print("  Cara pakai:")
     print("  - PocketPal: import .gguf file (lihat docs/POCKETPAL.md)")
     print("  - Ollama:    ollama create aurum-brain -f modelfile")
     print("  - llama.cpp: ./main -m aurum-brain-q4_k_m.gguf -p 'Halo!'")
 
-
 def convert_to_gguf():
     """Convert merged model ke GGUF format dengan quantization Q4_K_M."""
-    # Clone llama.cpp kalau belum ada
     llama_cpp_dir = OUT_DIR.parent / "llama.cpp"
+    
+    # Clone llama.cpp kalau belum ada
     if not llama_cpp_dir.exists():
         print("   Cloning llama.cpp...")
         subprocess.run([
@@ -240,20 +207,35 @@ def convert_to_gguf():
             str(llama_cpp_dir)
         ], check=True)
     
-    # Convert HF -> GGUF (F16 dulu)
+    # Convert HF -> GGUF (F16 dulu) - FIXED: script is at root of llama.cpp repo
     print("   Convert HF -> GGUF (F16)...")
     f16_gguf = OUT_DIR / "aurum-brain-f16.gguf"
+    
+    # Check multiple possible locations for convert script
+    convert_script = llama_cpp_dir / "convert_hf_to_gguf.py"
+    if not convert_script.exists():
+        # Try to find it
+        for possible in [
+            llama_cpp_dir / "convert_hf_to_gguf.py",
+            llama_cpp_dir / "convert-hf-to-gguf.py",
+        ]:
+            if possible.exists():
+                convert_script = possible
+                break
+    
+    if not convert_script.exists():
+        raise RuntimeError(f"convert_hf_to_gguf.py tidak ditemukan di {llama_cpp_dir}")
+    
     subprocess.run([
         sys.executable,
-        str(llama_cpp_dir / "convert_hf_to_gguf.py"),
+        str(convert_script),
         str(MERGED_DIR),
         "--outfile", str(f16_gguf),
         "--outtype", "f16",
     ], check=True)
     
-    # Quantize ke Q4_K_M (optimal untuk mobile)
+    # Quantize ke Q4_K_M
     print("   Quantize F16 -> Q4_K_M...")
-    # Cari binary quantize (nama berbeda di versi llama.cpp baru vs lama)
     quantize_bin = None
     for name in ["llama-quantize", "quantize"]:
         path = llama_cpp_dir / "build" / "bin" / name
@@ -261,7 +243,6 @@ def convert_to_gguf():
             quantize_bin = path
             break
     if not quantize_bin:
-        # Fallback: cari di root llama.cpp
         for name in ["llama-quantize", "quantize"]:
             path = llama_cpp_dir / name
             if path.exists():
@@ -279,12 +260,11 @@ def convert_to_gguf():
         "Q4_K_M",
     ], check=True)
     
-    # Cleanup F16 file (besar, tidak perlu)
+    # Cleanup F16 file
     if f16_gguf.exists():
         f16_gguf.unlink()
     
     print(f"   OK GGUF saved: {GGUF_PATH}")
-
 
 if __name__ == "__main__":
     main()
