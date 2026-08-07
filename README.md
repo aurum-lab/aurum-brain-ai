@@ -5,7 +5,7 @@
 > Output: **GGUF Q4_K_M** (~2GB) — siap pakai di **PocketPal (HP)**, **Ollama**, **LM Studio**, **llama.cpp** — **100% offline**, gratis selamanya.
 
 ![Model](https://img.shields.io/badge/Base-Qwen2.5--3B--Instruct-blue)
-![Fine-tune](https://img.shields.io/badge/Method-LoRA%20(r%3D32%2C%20alpha%3D64)-purple)
+![Fine-tune](https://img.shields.io/badge/Method-LoRA%20(r%3D16%2C%20alpha%3D32)-purple)
 ![Format](https://img.shields.io/badge/Format-GGUF%20Q4_K__M-green)
 ![Size](https://img.shields.io/badge/Size-~2GB-orange)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -116,7 +116,11 @@ aurum-brain-ai/
 ├── scripts/
 │   ├── generate_source.js         # Generator variasi dataset (Node.js)
 │   ├── build_dataset.py           # Build train.jsonl dari conversations_source.json
-│   └── train.py                   # LoRA fine-tuning script (Transformers + PEFT)
+│   ├── expand_dataset.py          # Auto-expand dataset harian (template-based)
+│   ├── expand_agent_dataset.py    # Multi-domain + Agent AI expansion
+│   ├── train.py                   # LoRA fine-tuning script (Transformers + PEFT)
+│   ├── distill_dataset.py         # Dataset distillation (opsional)
+│   └── upload_to_hf.py            # Upload merged model ke Hugging Face Hub
 ├── .github/workflows/
 │   ├── train.yml                  # Manual trigger: train + release GGUF
 │   ├── daily-train.yml            # Scheduled daily: expand dataset → train → release
@@ -138,16 +142,16 @@ aurum-brain-ai/
 |-----------|-------|
 | **Base model** | Qwen/Qwen2.5-3B-Instruct |
 | **Fine-tune method** | LoRA (Low-Rank Adaptation) |
-| **LoRA rank (r)** | 32 |
-| **LoRA alpha** | 64 |
+| **LoRA rank (r)** | 16 |
+| **LoRA alpha** | 32 |
 | **LoRA dropout** | 0.05 |
 | **Target modules** | q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj |
-| **Training epochs** | 3 (per run) |
+| **Training epochs** | 2 (per run) / 1 (daily auto) |
 | **Batch size** | 1 |
 | **Gradient accumulation** | 4 |
-| **Max sequence length** | 768 tokens |
+| **Max sequence length** | 768 tokens (manual) / 512 (daily auto) |
 | **Learning rate** | 2e-4 |
-| **Optimizer** | AdamW 8-bit |
+| **Optimizer** | AdamW |
 | **Quantization** | Q4_K_M (llama.cpp k-quant) |
 | **Output format** | GGUF (llama.cpp compatible) |
 | **File size** | ~2 GB |
@@ -187,13 +191,16 @@ AI dirancang dengan karakter konsisten via `system_prompt.txt`:
 | **Web Dev** | landing page, form validation, Next.js API, dark mode, carousel |
 | **Software Eng** | debugging, microservices vs monolith, Git, Docker, security, testing |
 | **General** | siapa kamu, belajar programming, problem solving |
+| **Agent AI** | function calling, tool use, autonomous task, multi-step reasoning |
+| **Multi-domain** | science, business, health, finance, legal, creative |
+| **Real-world scenarios** | business plan, technical docs, code review, architecture design |
 
 **Auto-expansion harian** (mirip NVIDIA Nemotron):
 - Setiap hari jam **10:00 WIB** (03:00 UTC) via `daily-train.yml`
 - Dataset di-expand: paraphrasing, variasi kode baru, konteks tambahan
 - LoRA re-train dari checkpoint terbaru
 - Release GGUF baru otomatis ke GitHub Releases + HF Hub
-- Cleanup release lama (keep 7 terbaru)
+- Cleanup release lama (keep 8 terbaru = 2 hari)
 - Tracking: `data/expansion_log.json`
 
 ---
