@@ -1,13 +1,13 @@
 # 🧠 Aurum Brain AI
 
-> **AI buatan Indonesia** — fine-tuned dari **Qwen2.5-3B-Instruct** untuk **Bahasa Indonesia native**, **coding expert**, dan **percakapan pintar**.
+> **AI buatan Indonesia** — fine-tuned dari **Qwen2.5-1.5B-Instruct** untuk **Bahasa Indonesia native**, **coding expert**, dan **percakapan pintar**.
 > 
-> Output: **GGUF Q4_K_M** (~2GB) — siap pakai di **PocketPal (HP)**, **Ollama**, **LM Studio**, **llama.cpp** — **100% offline**, gratis selamanya.
+> Output: **GGUF Q4_K_M** (~1.2GB) — siap pakai di **PocketPal (HP)**, **Ollama**, **LM Studio**, **llama.cpp** — **100% offline**, gratis selamanya.
 
-![Model](https://img.shields.io/badge/Base-Qwen2.5--3B--Instruct-blue)
+![Model](https://img.shields.io/badge/Base-Qwen2.5--1.5B--Instruct-blue)
 ![Fine-tune](https://img.shields.io/badge/Method-LoRA%20(r%3D16%2C%20alpha%3D32)-purple)
 ![Format](https://img.shields.io/badge/Format-GGUF%20Q4_K__M-green)
-![Size](https://img.shields.io/badge/Size-~2GB-orange)
+![Size](https://img.shields.io/badge/Size-~1.2GB-orange)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Auto Train](https://img.shields.io/badge/Auto_Train-Daily%20(NVIDIA--style)-red)
 
@@ -15,7 +15,7 @@
 
 ## 🎯 Apa Ini?
 
-**Aurum Brain AI** adalah model bahasa custom yang di-fine-tune dari **Qwen2.5-3B-Instruct** menggunakan dataset Bahasa Indonesia berkualitas tinggi (39+ percakapan, terus bertambah via auto-expansion).
+**Aurum Brain AI** adalah model bahasa custom yang di-fine-tune dari **Qwen2.5-1.5B-Instruct** menggunakan dataset Bahasa Indonesia berkualitas tinggi (39+ percakapan, terus bertambah via auto-expansion).
 
 **Kelebihan:**
 - 🇮🇩 **Bahasa Indonesia native** — bukan terjemahan, tapi natural & santai
@@ -38,7 +38,7 @@
 **File wajib:**
 | File | Ukuran | Fungsi |
 |------|--------|--------|
-| `aurum-brain-q4_k_m.gguf` | ~2GB | Model utama (quantized Q4_K_M) |
+| `aurum-brain-q4_k_m.gguf` | ~1.2GB | Model utama (quantized Q4_K_M) |
 | `system_prompt.txt` | ~4KB | **WAJIB** — personality AI (set di PocketPal/Ollama/LM Studio) |
 
 ---
@@ -138,9 +138,7 @@ aurum-brain-ai/
 
 ## 🧬 Spesifikasi Model Teknis
 
-| Parameter | Nilai |
-|-----------|-------|
-| **Base model** | Qwen/Qwen2.5-3B-Instruct |
+| **Base model** | Qwen/Qwen2.5-1.5B-Instruct |
 | **Fine-tune method** | LoRA (Low-Rank Adaptation) |
 | **LoRA rank (r)** | 16 |
 | **LoRA alpha** | 32 |
@@ -154,9 +152,9 @@ aurum-brain-ai/
 | **Optimizer** | AdamW |
 | **Quantization** | Q4_K_M (llama.cpp k-quant) |
 | **Output format** | GGUF (llama.cpp compatible) |
-| **File size** | ~2 GB |
+| **File size** | ~1.2 GB |
 | **Context window** | 4096 tokens (~3000 kata) |
-| **Min RAM** | 4 GB (mobile), 8 GB (desktop) |
+| **Min RAM** | 3 GB (mobile), 6 GB (desktop) |
 | **License** | MIT (base model: Tongyi Qianwen License) |
 
 ---
@@ -253,7 +251,7 @@ curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/con
 
 ## 🆚 Perbandingan
 
-| Aspek | Aurum Brain AI | ChatGPT/Claude/Gemini | Llama 3.2 3B (base) |
+| Aspek | Aurum Brain AI | ChatGPT/Claude/Gemini | Llama 3.2 1B/3B (base) |
 |-------|----------------|------------------------|---------------------|
 | **Bahasa Indonesia** | ✅ Native fine-tuned | 🌐 Multilingual (biasa) | 🌐 Multilingual (biasa) |
 | **Coding** | ✅ Good (dataset fokus) | ✅ Excellent | ✅ Good |
@@ -261,7 +259,7 @@ curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/con
 | **Biaya** | ✅ Gratis selamanya | 💰 Subscription | ✅ Gratis |
 | **Offline** | ✅ Ya | ❌ Tidak | ✅ Ya |
 | **Customizable** | ✅ Bisa retrain | ❌ Tidak | ✅ Bisa retrain |
-| **Ukuran** | 2 GB (Q4) | Cloud (100B+) | 2 GB (Q4) |
+| **Ukuran** | 1.2 GB (Q4) | Cloud (100B+) | 1-2 GB (Q4) |
 | **System Prompt** | ✅ Custom (wajib) | ⚠️ Limited | ⚠️ Manual |
 
 ---
@@ -269,7 +267,7 @@ curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/con
 ## 🗺️ Roadmap
 
 - [x] **v1.0** — Base release 28 percakapan
-- [x] **v1.1** — 39+ percakapan, daily auto-train pipeline
+- [x] **v1.1** — 39+ percakapan, daily auto-train pipeline (default 1.5B model for GH Actions)
 - [ ] **v1.2** — Variant Q5_K_M / Q8_0 untuk quality lebih tinggi
 - [ ] **v1.3** — Base model upgrade ke Qwen2.5-7B (HP flagship)
 - [ ] **v2.0** — Multi-modal (text + image input via LLaVA)
@@ -294,7 +292,7 @@ curl -s https://raw.githubusercontent.com/aurum-lab/aurum-brain-ai/main/data/con
 **MIT License** — bebas pakai, modifikasi, distribusi, komersial.
 Atribusi dihargai tapi tidak wajib.
 
-**Base model:** Qwen2.5-3B-Instruct — [Tongyi Qianwen License](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/LICENSE)
+**Base model:** Qwen2.5-1.5B-Instruct — [Tongyi Qianwen License](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct/blob/main/LICENSE)
 
 ---
 
