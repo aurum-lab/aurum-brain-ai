@@ -132,6 +132,17 @@ jobs:
           pip install -q huggingface_hub
           python scripts/upload_to_hf.py
 
+      - name: Push metrics to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BASE_MODEL: ${{ github.event.inputs.base_model || 'Qwen/Qwen2.5-3B-Instruct' }}
+          EPOCHS: ${{ github.event.inputs.epochs || '2' }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          pip install -q requests
+          python scripts/push_metrics_to_supabase.py
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
