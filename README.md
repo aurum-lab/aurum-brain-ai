@@ -298,7 +298,7 @@ Atribusi dihargai tapi tidak wajib.
 
 ## 🙏 Credits
 
-- **Base model:** [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) oleh **Alibaba Cloud**
+- **Base model:** [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct) oleh **Alibaba Cloud**
 - **Training framework:** [Transformers](https://github.com/huggingface/transformers) + [PEFT](https://github.com/huggingface/peft) oleh **Hugging Face**
 - **Quantization/GGUF:** [llama.cpp](https://github.com/ggerganov/llama.cpp) oleh **Georgi Gerganov**
 - **Dataset & Fine-tune:** **Aurum Lab** (curated manual + auto-expansion)
