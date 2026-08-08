@@ -82,6 +82,7 @@ jobs:
           MAX_LEN: '768'
           LORA_R: '16'
           LORA_ALPHA: '32'
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           echo "=== Training config ==="
           echo "Base: $AURUM_BASE_MODEL"
