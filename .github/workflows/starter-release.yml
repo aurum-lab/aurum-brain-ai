@@ -73,6 +73,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VER="starter-v$(date +%Y.%m.%d)"
+          
+          # Check both release AND tag (orphan tags won't show in release list)
+          if gh release view "$VER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
+          elif git ls-remote --tags origin | grep -q "refs/tags/$VER$"; then
+            echo "Orphan tag $VER exists, deleting..."
+            git push origin --delete "$VER" 2>/dev/null || true
+            gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
+          fi
+          
           gh release create "$VER" \
             out/aurum-brain-starter-q4_k_m.gguf \
             data/system_prompt.txt \

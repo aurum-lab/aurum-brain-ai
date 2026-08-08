@@ -56,11 +56,19 @@ jobs:
         if: steps.llama-cache.outputs.cache-hit != 'true'
         run: |
           set -e
-          git clone --depth 1 https://github.com/ggerganov/llama.cpp
-          cd llama.cpp
+          # Handle case where directory exists from cache restore (partial key match)
+          if [ -d "llama.cpp" ]; then
+            echo "llama.cpp directory exists, updating..."
+            cd llama.cpp
+            git fetch --depth 1 origin
+            git reset --hard origin/master
+          else
+            git clone --depth 1 https://github.com/ggerganov/llama.cpp
+            cd llama.cpp
+          fi
           cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
           cmake --build build --config Release -j 2 --target llama-quantize 2>&1 | tail -20
-          # Coba kedua nama binary yang mungkin
+          # Coba kedua nama binary yang mungkin (llama-quantize atau quantize)
           if [ -f build/bin/llama-quantize ]; then
             ln -sf llama-quantize build/bin/quantize 2>/dev/null || true
           elif [ -f build/bin/quantize ]; then
@@ -73,6 +81,18 @@ jobs:
             fi
           fi
           # Verifikasi
+          ls -la build/bin/ | grep -E "quantize|llama-quantize" || echo "WARNING: quantize not found"
+
+      # Ensure quantize symlink exists even on cache hit
+      - name: Ensure quantize symlink (cache hit)
+        if: steps.llama-cache.outputs.cache-hit == 'true'
+        run: |
+          cd llama.cpp
+          if [ -f build/bin/llama-quantize ] && [ ! -f build/bin/quantize ]; then
+            ln -sf llama-quantize build/bin/quantize
+          elif [ -f build/bin/quantize ] && [ ! -f build/bin/llama-quantize ]; then
+            ln -sf quantize build/bin/llama-quantize
+          fi
           ls -la build/bin/ | grep -E "quantize|llama-quantize" || echo "WARNING: quantize not found"
 
       - name: Expand dataset (hanya kalau < 150 convos)
@@ -166,8 +186,13 @@ jobs:
           VER="daily-$(date +%Y.%m.%d-%H)"
           DATASET_SIZE=$(wc -l < data/train.jsonl)
           
+          # Check both release AND tag (orphan tags won't show in release list)
           if gh release view "$VER" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag
+          elif git ls-remote --tags origin | grep -q "refs/tags/$VER$"; then
+            echo "Orphan tag $VER exists, deleting..."
+            git push origin --delete "$VER" 2>/dev/null || true
+            gh release delete "$VER" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
           fi
           
           cat > /tmp/release_notes.md << 'RELEASEEOF'
