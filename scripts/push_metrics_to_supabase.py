@@ -30,6 +30,11 @@ HEADERS = {
     "Prefer": "return=representation"
 }
 
+UPSERT_HEADERS = {
+    **HEADERS,
+    "Prefer": "resolution=merge-duplicates,return=representation"
+}
+
 def supabase_request(method, table, data=None, params=None):
     url = f"{SUPABASE_URL}/rest/v1/{table}"
     resp = requests.request(method, url, headers=HEADERS, json=data, params=params, timeout=30)
@@ -49,7 +54,7 @@ def get_brainstat():
 
 def upsert_brainstat(stat):
     """Upsert BrainStat row"""
-    return supabase_request("POST", "BrainStat", data=stat, params={"on_conflict": "id"})
+    return supabase_request("POST", "BrainStat", data=stat, params={"on_conflict": "id"}, headers=UPSERT_HEADERS)
 
 def insert_learninglog(log):
     """Insert LearningLog row"""
