@@ -35,9 +35,10 @@ UPSERT_HEADERS = {
     "Prefer": "resolution=merge-duplicates,return=representation"
 }
 
-def supabase_request(method, table, data=None, params=None):
+def supabase_request(method, table, data=None, params=None, headers=None):
     url = f"{SUPABASE_URL}/rest/v1/{table}"
-    resp = requests.request(method, url, headers=HEADERS, json=data, params=params, timeout=30)
+    h = headers or HEADERS
+    resp = requests.request(method, url, headers=h, json=data, params=params, timeout=30)
     if resp.status_code >= 400:
         print(f"❌ Supabase {method} {table} failed: {resp.status_code} {resp.text}")
         resp.raise_for_status()
