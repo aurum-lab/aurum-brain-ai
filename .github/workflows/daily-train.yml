@@ -66,7 +66,8 @@ jobs:
             git clone --depth 1 https://github.com/ggerganov/llama.cpp
             cd llama.cpp
           fi
-          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+          # Disable native CPU optimizations (SIGILL fix for GitHub Actions runners)
+          cmake -B build -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF -DLLAMA_NATIVE=OFF
           cmake --build build --config Release -j 2 --target llama-quantize 2>&1 | tail -20
           # Coba kedua nama binary yang mungkin (llama-quantize atau quantize)
           if [ -f build/bin/llama-quantize ]; then
