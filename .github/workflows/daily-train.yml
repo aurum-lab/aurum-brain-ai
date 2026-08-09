@@ -42,9 +42,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: llama.cpp
-          key: llama-cpp-${{ runner.os }}-${{ hashFiles('scripts/train.py') }}
+          key: llama-cpp-v3-${{ runner.os }}-${{ hashFiles('scripts/train.py') }}
           restore-keys: |
-            llama-cpp-${{ runner.os }}-
+            llama-cpp-v3-${{ runner.os }}-
 
       - name: Install Python dependencies
         run: |
