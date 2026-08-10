@@ -137,6 +137,9 @@ def main():
     ]
     dataset = Dataset.from_list(ds_dict)
     print(f"   OK Dataset ready: {len(dataset)} examples")
+    # Calculate warmup steps
+    total_steps = (len(dataset) // (BATCH_SIZE * GRAD_ACCUM)) * EPOCHS
+    warmup_steps = int(total_steps * 0.1)  # 10% of total steps
     
     print("\n[4/6] Start training...")
     from transformers import Trainer, TrainingArguments
@@ -147,7 +150,7 @@ def main():
         per_device_train_batch_size=BATCH_SIZE,
         gradient_accumulation_steps=GRAD_ACCUM,
         learning_rate=LEARNING_RATE,
-        warmup_ratio=0.1,
+        warmup_steps=warmup_steps,
         logging_steps=5,
         save_strategy="epoch",
         save_total_limit=1,
