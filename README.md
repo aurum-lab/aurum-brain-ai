@@ -106,14 +106,16 @@ cd llama.cpp && make -j
 
 ### 5. Web Chat (Browser) 🆕
 
-> **[chat/](chat/)** — Interface web untuk chat langsung via browser, koneksi ke Ollama.
+> **[docs/](docs/)** — Interface web untuk chat langsung via browser, koneksi ke Ollama.
+> 
+> 🌐 **Live:** https://aurum-lab.github.io/aurum-brain-ai/
 
 ```bash
 # Pastikan Ollama running
 ollama serve
 
-# Buka chat/index.html di browser
-# Atau akses via GitHub Pages
+# Buka docs/index.html di browser
+# Atau akses via link di atas
 ```
 
 Fitur:
@@ -123,7 +125,7 @@ Fitur:
 - 📱 Responsive (bisa di HP)
 - 🌙 Dark theme
 
-📖 Detail: **[chat/README.md](chat/README.md)**
+📖 Detail: **[docs/README.md](docs/README.md)**
 
 ---
 
@@ -131,7 +133,7 @@ Fitur:
 
 ```
 aurum-brain-ai/
-├── chat/                        # Web chat interface (connect ke Ollama)
+├── docs/                        # Web chat interface (GitHub Pages)
 │   ├── index.html
 │   ├── style.css
 │   ├── app.js
