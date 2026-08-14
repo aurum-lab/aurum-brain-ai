@@ -104,10 +104,38 @@ cd llama.cpp && make -j
 
 ---
 
+### 5. Web Chat (Browser) 🆕
+
+> **[chat/](chat/)** — Interface web untuk chat langsung via browser, koneksi ke Ollama.
+
+```bash
+# Pastikan Ollama running
+ollama serve
+
+# Buka chat/index.html di browser
+# Atau akses via GitHub Pages
+```
+
+Fitur:
+- 💬 Real-time streaming chat
+- 🎛️ Configurable temperature & max tokens
+- 📝 Custom system prompt
+- 📱 Responsive (bisa di HP)
+- 🌙 Dark theme
+
+📖 Detail: **[chat/README.md](chat/README.md)**
+
+---
+
 ## 🏗️ Struktur Repo
 
 ```
 aurum-brain-ai/
+├── chat/                        # Web chat interface (connect ke Ollama)
+│   ├── index.html
+│   ├── style.css
+│   ├── app.js
+│   └── README.md
 ├── data/
 │   ├── system_prompt.txt          # Personality AI (IQ tinggi, jago coding, Bahasa Indonesia native)
 │   ├── conversations_source.json  # 39+ percakapan source (manual curated)

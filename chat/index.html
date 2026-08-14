@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurum Brain AI — Chat</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>🧠 Aurum Brain</h1>
+                <button class="btn-icon" id="closeSidebar">✕</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="setting-group">
+                    <label>Ollama Server URL</label>
+                    <input type="text" id="serverUrl" value="http://localhost:11434" placeholder="http://localhost:11434">
+                </div>
+                <div class="setting-group">
+                    <label>Model</label>
+                    <input type="text" id="modelName" value="aurum-brain" placeholder="aurum-brain">
+                </div>
+                <div class="setting-group">
+                    <label>System Prompt</label>
+                    <textarea id="systemPrompt" rows="6" placeholder="System prompt...">Kamu adalah Aurum Brain AI, AI asisten yang ahli dalam coding, problem solving, dan percakapan dalam Bahasa Indonesia. Kamu percaya diri, to the point, dan memberikan jawaban yang akurat.</textarea>
+                </div>
+                <div class="setting-group">
+                    <label>Temperature: <span id="tempValue">0.7</span></label>
+                    <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                </div>
+                <div class="setting-group">
+                    <label>Max Tokens: <span id="maxTokensValue">2048</span></label>
+                    <input type="range" id="maxTokens" min="256" max="8192" step="256" value="2048">
+                </div>
+                <button class="btn btn-primary" id="checkConnection">🔌 Test Connection</button>
+                <div id="connectionStatus" class="status"></div>
+            </div>
+            <div class="sidebar-footer">
+                <button class="btn btn-danger" id="clearChat">🗑️ Clear Chat</button>
+                <button class="btn" id="exportChat">💾 Export Chat</button>
+            </div>
+        </aside>
+
+        <!-- Main Chat -->
+        <main class="main">
+            <header class="chat-header">
+                <button class="btn-icon" id="openSidebar">☰</button>
+                <div class="header-info">
+                    <h2>🧠 Aurum Brain AI</h2>
+                    <span class="subtitle">Qwen2.5-1.5B Fine-tuned • Bahasa Indonesia</span>
+                </div>
+                <div class="header-status" id="headerStatus">
+                    <span class="dot offline"></span> Offline
+                </div>
+            </header>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome" id="welcome">
+                    <div class="welcome-icon">🧠</div>
+                    <h2>Aurum Brain AI</h2>
+                    <p>AI Bahasa Indonesia — Coding, Problem Solving, Percakapan</p>
+                    <div class="welcome-features">
+                        <div class="feature">💻 Coding Expert</div>
+                        <div class="feature">🇮🇩 Bahasa Indonesia Native</div>
+                        <div class="feature">🔒 100% Offline & Private</div>
+                        <div class="feature">🆓 Gratis Selamanya</div>
+                    </div>
+                    <div class="quick-prompts">
+                        <button class="quick-prompt" data-prompt="Halo! Siapa kamu?">👋 Halo! Siapa kamu?</button>
+                        <button class="quick-prompt" data-prompt="Buatkan function Python untuk sorting list">🐍 Buatkan function Python</button>
+                        <button class="quick-prompt" data-prompt="Jelaskan apa itu recursion dengan contoh">📚 Jelaskan recursion</button>
+                        <button class="quick-prompt" data-prompt="Bantu saya debugging code JavaScript">🐛 Debug JavaScript</button>
+                    </div>
+                </div>
+                <div class="messages" id="messages"></div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="userInput" placeholder="Ketik pesan... (Enter untuk kirim, Shift+Enter untuk baris baru)" rows="1"></textarea>
+                    <button class="btn-send" id="sendBtn" disabled>
+                        <span class="send-icon">➤</span>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <span>Powered by <strong>Qwen2.5-1.5B</strong> + <strong>LoRA Fine-tune</strong></span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
